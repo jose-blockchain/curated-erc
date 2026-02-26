@@ -2,7 +2,7 @@
   <img src="img/logo.jpg" alt="Curated ERC" width="400" />
 </p>
 
-# curated-erc
+# Curated ERC
 
 > v0.1.0
 
@@ -124,7 +124,30 @@ The plugin picks up remappings automatically. Imports work the same way as in Fo
 import {ERC4907} from "curated-erc/token/ERC4907/ERC4907.sol";
 ```
 
-> **Note:** If your project does not use Foundry at all and you prefer pure npm, you can copy the `src/` folder into your contracts directory and install the OpenZeppelin dependencies via npm (`@openzeppelin/contracts` and `@openzeppelin/contracts-upgradeable`). The import paths are already `@openzeppelin/`-prefixed, so they resolve from `node_modules/` without changes.
+### Hardhat (npm)
+
+If you use Hardhat without Foundry, install from npm and add OpenZeppelin as dependencies:
+
+1. Install the library and its peer dependencies:
+
+```bash
+npm install curated-erc @openzeppelin/contracts@5.5.0 @openzeppelin/contracts-upgradeable@5.5.0
+```
+
+2. Import and extend in your contracts (same paths as Foundry):
+
+```solidity
+import {ERC1363} from "curated-erc/token/ERC1363/ERC1363.sol";
+import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+contract MyPayableToken is ERC1363 {
+    constructor() ERC20("MyToken", "MTK") {
+        _mint(msg.sender, 1_000_000e18);
+    }
+}
+```
+
+Hardhat will compile the contracts in `node_modules/curated-erc` when resolving these imports; no extra config is needed. Use Solidity `^0.8.20` (e.g. `0.8.24`) in your `hardhat.config` to match the library.
 
 ## Development
 

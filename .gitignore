@@ -1,3 +1,9 @@
+# npm prepublishOnly copies (do not commit)
+/token
+/metatx
+/finance
+/utils
+
 # Foundry
 cache/
 out/

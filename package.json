@@ -1,0 +1,42 @@
+{
+  "name": "curated-erc",
+  "version": "0.1.0",
+  "description": "Reference implementations of ERCs with real on-chain traction. Foundry-native, Solidity-tested.",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jose-blockchain/curated-erc.git"
+  },
+  "keywords": [
+    "ethereum",
+    "solidity",
+    "erc",
+    "erc1363",
+    "erc5192",
+    "erc4907",
+    "erc1271",
+    "erc2771",
+    "erc3156",
+    "foundry"
+  ],
+  "files": [
+    "token",
+    "metatx",
+    "finance",
+    "utils",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "prepublishOnly": "node scripts/copy-src-to-root.js"
+  },
+  "peerDependencies": {
+    "@openzeppelin/contracts": "^5.0.0",
+    "@openzeppelin/contracts-upgradeable": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@openzeppelin/contracts": { "optional": true },
+    "@openzeppelin/contracts-upgradeable": { "optional": true }
+  }
+}
