@@ -1,0 +1,30 @@
+# Foundry
+cache/
+out/
+/broadcast
+
+# Coverage
+coverage/
+*.lcov
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Node (Hardhat / npm)
+node_modules/
+
+# Generated docs
+docs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
