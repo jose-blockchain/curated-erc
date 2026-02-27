@@ -20,9 +20,6 @@ interface IERC2309 {
      * @param toAddress The recipient (zero address for burns).
      */
     event ConsecutiveTransfer(
-        uint256 indexed fromTokenId,
-        uint256 toTokenId,
-        address indexed fromAddress,
-        address indexed toAddress
+        uint256 indexed fromTokenId, uint256 toTokenId, address indexed fromAddress, address indexed toAddress
     );
 }

@@ -26,9 +26,13 @@ abstract contract ERC1363Upgradeable is Initializable, ERC20Upgradeable, ERC165U
     function __ERC1363_init_unchained() internal onlyInitializing {}
 
     /// @inheritdoc IERC165
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC165Upgradeable, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC165Upgradeable, IERC165)
+        returns (bool)
+    {
         return interfaceId == type(IERC1363).interfaceId || super.supportsInterface(interfaceId);
     }
 
@@ -54,12 +58,11 @@ abstract contract ERC1363Upgradeable is Initializable, ERC20Upgradeable, ERC165U
     }
 
     /// @inheritdoc IERC1363
-    function transferFromAndCall(
-        address from,
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) public virtual returns (bool) {
+    function transferFromAndCall(address from, address to, uint256 value, bytes calldata data)
+        public
+        virtual
+        returns (bool)
+    {
         transferFrom(from, to, value);
         _checkOnTransferReceived(from, to, value, data);
         return true;

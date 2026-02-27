@@ -21,8 +21,7 @@ import {IERC1271} from "./IERC1271.sol";
  * function is intentionally non-view to allow factory deployment.
  */
 library ERC6492 {
-    bytes32 constant ERC6492_DETECTION_SUFFIX =
-        0x6492649264926492649264926492649264926492649264926492649264926492;
+    bytes32 constant ERC6492_DETECTION_SUFFIX = 0x6492649264926492649264926492649264926492649264926492649264926492;
 
     bytes4 constant ERC1271_MAGIC = 0x1626ba7e;
 
@@ -38,10 +37,7 @@ library ERC6492 {
      */
     function isValidSig(address signer, bytes32 hash, bytes calldata signature) internal returns (bool) {
         // Check for ERC-6492 wrapped signature (ends with detection suffix)
-        if (
-            signature.length >= 32
-                && bytes32(signature[signature.length - 32:]) == ERC6492_DETECTION_SUFFIX
-        ) {
+        if (signature.length >= 32 && bytes32(signature[signature.length - 32:]) == ERC6492_DETECTION_SUFFIX) {
             bytes calldata wrappedSig = signature[:signature.length - 32];
             (address factory, bytes memory factoryCalldata, bytes memory originalSig) =
                 abi.decode(wrappedSig, (address, bytes, bytes));

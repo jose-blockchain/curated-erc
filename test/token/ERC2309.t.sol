@@ -21,12 +21,7 @@ contract MockConsecutive is ERC721Consecutive {
 }
 
 contract MultiBatchConsecutive is ERC721Consecutive {
-    constructor(
-        address recipient1,
-        uint96 size1,
-        address recipient2,
-        uint96 size2
-    ) ERC721("MultiBatch", "MB") {
+    constructor(address recipient1, uint96 size1, address recipient2, uint96 size2) ERC721("MultiBatch", "MB") {
         _mintConsecutive(recipient1, size1);
         _mintConsecutive(recipient2, size2);
     }
@@ -220,9 +215,9 @@ contract ERC2309Test is Test {
     // --- Max batch size exceeded ---
 
     function test_maxBatchSize_reverts() public {
-        vm.expectRevert(abi.encodeWithSelector(
-            ERC721Consecutive.ERC721ConsecutiveExceededMaxBatch.selector, 5001, 5000
-        ));
+        vm.expectRevert(
+            abi.encodeWithSelector(ERC721Consecutive.ERC721ConsecutiveExceededMaxBatch.selector, 5001, 5000)
+        );
         new MockConsecutive(alice, 5001);
     }
 

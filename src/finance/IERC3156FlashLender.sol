@@ -32,10 +32,7 @@ interface IERC3156FlashLender {
      * @param data Arbitrary data to pass to the borrower's `onFlashLoan` callback.
      * @return True if the flash loan was successful.
      */
-    function flashLoan(
-        IERC3156FlashBorrower receiver,
-        address token,
-        uint256 amount,
-        bytes calldata data
-    ) external returns (bool);
+    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
+        external
+        returns (bool);
 }

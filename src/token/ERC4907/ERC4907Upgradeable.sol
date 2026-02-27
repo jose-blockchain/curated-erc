@@ -62,7 +62,13 @@ abstract contract ERC4907Upgradeable is Initializable, ERC721Upgradeable, IERC49
         return $._users[tokenId].expires;
     }
 
-    function supportsInterface(bytes4 interfaceId) public view virtual override(ERC721Upgradeable, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721Upgradeable, IERC165)
+        returns (bool)
+    {
         return interfaceId == type(IERC4907).interfaceId || super.supportsInterface(interfaceId);
     }
 

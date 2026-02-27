@@ -149,8 +149,7 @@ contract ERC6492Test is Test {
 
         bytes memory factoryCalldata = abi.encodeCall(WalletFactory.deploy, (signer, salt));
         bytes memory wrappedSig = abi.encodePacked(
-            abi.encode(address(factory), factoryCalldata, originalSig),
-            ERC6492.ERC6492_DETECTION_SUFFIX
+            abi.encode(address(factory), factoryCalldata, originalSig), ERC6492.ERC6492_DETECTION_SUFFIX
         );
 
         assertTrue(validator.isValidSig(predicted, hash, wrappedSig));
@@ -167,8 +166,7 @@ contract ERC6492Test is Test {
 
         bytes memory factoryCalldata = abi.encodeCall(WalletFactory.deploy, (signer, salt));
         bytes memory wrappedSig = abi.encodePacked(
-            abi.encode(address(factory), factoryCalldata, originalSig),
-            ERC6492.ERC6492_DETECTION_SUFFIX
+            abi.encode(address(factory), factoryCalldata, originalSig), ERC6492.ERC6492_DETECTION_SUFFIX
         );
 
         assertFalse(validator.isValidSig(predicted, hash, wrappedSig));
@@ -183,8 +181,7 @@ contract ERC6492Test is Test {
 
         // Bad factory calldata that will fail
         bytes memory wrappedSig = abi.encodePacked(
-            abi.encode(address(factory), hex"deadbeef", originalSig),
-            ERC6492.ERC6492_DETECTION_SUFFIX
+            abi.encode(address(factory), hex"deadbeef", originalSig), ERC6492.ERC6492_DETECTION_SUFFIX
         );
 
         vm.expectRevert(ERC6492.ERC6492DeployFailed.selector);
@@ -203,8 +200,7 @@ contract ERC6492Test is Test {
         // Wrap with ERC-6492 suffix even though already deployed
         bytes memory factoryCalldata = abi.encodeCall(WalletFactory.deploy, (signer, salt));
         bytes memory wrappedSig = abi.encodePacked(
-            abi.encode(address(factory), factoryCalldata, originalSig),
-            ERC6492.ERC6492_DETECTION_SUFFIX
+            abi.encode(address(factory), factoryCalldata, originalSig), ERC6492.ERC6492_DETECTION_SUFFIX
         );
 
         assertTrue(validator.isValidSig(wallet, hash, wrappedSig));
@@ -225,8 +221,7 @@ contract ERC6492Test is Test {
         bytes memory factoryCalldata = abi.encodeCall(UpgradeableWallet.setOwner, (signer));
 
         bytes memory wrappedSig = abi.encodePacked(
-            abi.encode(address(wallet), factoryCalldata, originalSig),
-            ERC6492.ERC6492_DETECTION_SUFFIX
+            abi.encode(address(wallet), factoryCalldata, originalSig), ERC6492.ERC6492_DETECTION_SUFFIX
         );
 
         // First ERC-1271 check fails (owner is address(0)), then prepare sets owner, retry passes

@@ -134,7 +134,7 @@ If you use Hardhat without Foundry, install from npm and add OpenZeppelin as dep
 npm install curated-erc @openzeppelin/contracts@5.5.0 @openzeppelin/contracts-upgradeable@5.5.0
 ```
 
-2. Import and extend in your contracts (same paths as Foundry):
+2. Import and extend in your contracts:
 
 ```solidity
 import {ERC1363} from "curated-erc/token/ERC1363/ERC1363.sol";

@@ -31,13 +31,11 @@ contract MockLender is ERC3156FlashLender {
 }
 
 contract GoodBorrower is IERC3156FlashBorrower {
-    function onFlashLoan(
-        address,
-        address token,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external override returns (bytes32) {
+    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata)
+        external
+        override
+        returns (bytes32)
+    {
         IERC20(token).approve(msg.sender, amount + fee);
         return keccak256("ERC3156FlashBorrower.onFlashLoan");
     }
@@ -61,13 +59,11 @@ contract BadBorrowerNoRepay is IERC3156FlashBorrower {
 }
 
 contract ReentrantBorrower is IERC3156FlashBorrower {
-    function onFlashLoan(
-        address,
-        address token,
-        uint256 amount,
-        uint256 fee,
-        bytes calldata
-    ) external override returns (bytes32) {
+    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata)
+        external
+        override
+        returns (bytes32)
+    {
         IERC20(token).approve(msg.sender, amount + fee);
         IERC3156FlashLender(msg.sender).flashLoan(this, token, amount, "");
         return keccak256("ERC3156FlashBorrower.onFlashLoan");

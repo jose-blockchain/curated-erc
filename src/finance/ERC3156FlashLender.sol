@@ -47,12 +47,12 @@ abstract contract ERC3156FlashLender is IERC3156FlashLender, ReentrancyGuard {
     }
 
     /// @inheritdoc IERC3156FlashLender
-    function flashLoan(
-        IERC3156FlashBorrower receiver,
-        address token,
-        uint256 amount,
-        bytes calldata data
-    ) public virtual nonReentrant returns (bool) {
+    function flashLoan(IERC3156FlashBorrower receiver, address token, uint256 amount, bytes calldata data)
+        public
+        virtual
+        nonReentrant
+        returns (bool)
+    {
         uint256 maxLoan = maxFlashLoan(token);
         if (amount > maxLoan) {
             revert ERC3156ExceededMaxLoan(maxLoan);

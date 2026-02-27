@@ -21,12 +21,11 @@ contract MockERC1363 is ERC1363 {
 contract ValidReceiver is IERC1363Receiver {
     event Received(address operator, address from, uint256 value, bytes data);
 
-    function onTransferReceived(
-        address operator,
-        address from,
-        uint256 value,
-        bytes calldata data
-    ) external override returns (bytes4) {
+    function onTransferReceived(address operator, address from, uint256 value, bytes calldata data)
+        external
+        override
+        returns (bytes4)
+    {
         emit Received(operator, from, value, data);
         return IERC1363Receiver.onTransferReceived.selector;
     }

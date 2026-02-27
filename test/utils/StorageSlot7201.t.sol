@@ -41,16 +41,14 @@ contract StorageSlot7201Test is Test {
 
     function test_reference_implementation() public pure {
         string memory id = "openzeppelin.storage.ERC20";
-        bytes32 expected =
-            keccak256(abi.encode(uint256(keccak256(bytes(id))) - 1)) & ~bytes32(uint256(0xff));
+        bytes32 expected = keccak256(abi.encode(uint256(keccak256(bytes(id))) - 1)) & ~bytes32(uint256(0xff));
         bytes32 result = StorageSlot7201.erc7201Slot(id);
         assertEq(result, expected);
     }
 
     function testFuzz_matchesReference(string memory id) public pure {
         vm.assume(bytes(id).length > 0);
-        bytes32 expected =
-            keccak256(abi.encode(uint256(keccak256(bytes(id))) - 1)) & ~bytes32(uint256(0xff));
+        bytes32 expected = keccak256(abi.encode(uint256(keccak256(bytes(id))) - 1)) & ~bytes32(uint256(0xff));
         bytes32 result = StorageSlot7201.erc7201Slot(id);
         assertEq(result, expected);
     }

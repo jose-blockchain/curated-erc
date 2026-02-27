@@ -16,9 +16,13 @@ abstract contract ERC4906Upgradeable is Initializable, ERC721Upgradeable, IERC49
     function __ERC4906_init_unchained() internal onlyInitializing {}
 
     /// @inheritdoc IERC165
-    function supportsInterface(
-        bytes4 interfaceId
-    ) public view virtual override(ERC721Upgradeable, IERC165) returns (bool) {
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721Upgradeable, IERC165)
+        returns (bool)
+    {
         return interfaceId == bytes4(0x49064906) || super.supportsInterface(interfaceId);
     }
 

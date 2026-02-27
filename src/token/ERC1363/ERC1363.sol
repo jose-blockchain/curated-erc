@@ -57,12 +57,11 @@ abstract contract ERC1363 is ERC20, ERC165, IERC1363 {
     }
 
     /// @inheritdoc IERC1363
-    function transferFromAndCall(
-        address from,
-        address to,
-        uint256 value,
-        bytes calldata data
-    ) public virtual returns (bool) {
+    function transferFromAndCall(address from, address to, uint256 value, bytes calldata data)
+        public
+        virtual
+        returns (bool)
+    {
         transferFrom(from, to, value);
         _checkOnTransferReceived(from, to, value, data);
         return true;

@@ -110,9 +110,7 @@ abstract contract ERC721Consecutive is ERC721, IERC2309 {
             revert ERC721ConsecutiveForbiddenMintDuringConstruction();
         }
 
-        if (
-            to == address(0) && tokenId < _nextConsecutiveId() && !_sequentialBurn.get(tokenId)
-        ) {
+        if (to == address(0) && tokenId < _nextConsecutiveId() && !_sequentialBurn.get(tokenId)) {
             _sequentialBurn.set(tokenId);
         }
 
