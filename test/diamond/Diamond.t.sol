@@ -98,6 +98,56 @@ contract DiamondTest is Test {
         assertEq(s.length, 3);
     }
 
+    function test_constructor_revert_zeroOwner() public {
+        IDiamond.FacetCut[] memory empty;
+        vm.expectRevert(LibDiamond.LibDiamondInvalidOwner.selector);
+        new Diamond(address(0), empty);
+    }
+
+    function test_diamondCut_revert_emptySelectors() public {
+        bytes4[] memory selectors = new bytes4[](0);
+        IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
+        cut[0] = IDiamond.FacetCut({
+            facetAddress: address(facet), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
+        });
+        vm.prank(owner);
+        vm.expectRevert(LibDiamond.LibDiamondEmptySelectors.selector);
+        IDiamondCut(address(diamond)).diamondCut(cut, address(0), "");
+    }
+
+    function test_diamondCut_revert_facetHasNoCode() public {
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = TestFacet.setValue.selector;
+        IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
+        cut[0] = IDiamond.FacetCut({
+            facetAddress: stranger, action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
+        });
+        vm.prank(owner);
+        vm.expectRevert(abi.encodeWithSelector(LibDiamond.LibDiamondFacetHasNoCode.selector, stranger));
+        IDiamondCut(address(diamond)).diamondCut(cut, address(0), "");
+    }
+
+    function test_diamondCut_revert_initHasNoCode() public {
+        IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](0);
+        vm.prank(owner);
+        vm.expectRevert(abi.encodeWithSelector(LibDiamond.LibDiamondInitHasNoCode.selector, stranger));
+        IDiamondCut(address(diamond)).diamondCut(cut, stranger, "");
+    }
+
+    function test_constructor_revert_immutableRemovalInInitialCut() public {
+        bytes4[] memory selectors = new bytes4[](1);
+        selectors[0] = IDiamondLoupe.facets.selector;
+        IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
+        cut[0] = IDiamond.FacetCut({
+            facetAddress: address(0), action: IDiamond.FacetCutAction.Remove, functionSelectors: selectors
+        });
+        vm.prank(owner);
+        vm.expectRevert(
+            abi.encodeWithSelector(LibDiamond.LibDiamondImmutableSelector.selector, IDiamondLoupe.facets.selector)
+        );
+        new Diamond(owner, cut);
+    }
+
     function test_diamondCut_revert_onlyOwner() public {
         bytes4[] memory selectors = new bytes4[](1);
         selectors[0] = TestFacet.setValue.selector;
