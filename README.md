@@ -36,6 +36,7 @@ Curated ERC Contracts fills that gap.
 | 2771 | Meta Transactions | Context / Gasless UX |
 | 3156 | Flash Loans | DeFi / Finance |
 | 7201 | Namespaced Storage Layout | Utils / Upgrades |
+| 2535 | Diamonds (Multi-Facet Proxy) | Proxy / Upgrades |
 
 Full plan across 40 ERCs in [ROADMAP.md](./ROADMAP.md). Release history in [CHANGELOG.md](./CHANGELOG.md).
 
@@ -52,6 +53,7 @@ src/
 │   └── ERC5484/          # Consensual Soulbound Tokens (burn authorization)
 ├── metatx/               # ERC-2771 Trusted Forwarder context
 ├── finance/              # ERC-3156 Flash Loan lender
+├── diamond/              # ERC-2535 Diamonds (multi-facet proxy)
 └── utils/
     ├── cryptography/     # ERC-1271 + ERC-6492 Signature validation
     └── StorageSlot7201.sol
