@@ -23,11 +23,15 @@ library LibDiamond {
     }
 
     error LibDiamondOnlyOwner();
+    error LibDiamondInvalidOwner();
     error LibDiamondSelectorAlreadyExists(bytes4 selector);
     error LibDiamondSelectorNotFound(bytes4 selector);
     error LibDiamondSelectorNotReplaced(bytes4 selector);
     error LibDiamondImmutableSelector(bytes4 selector);
     error LibDiamondInvalidFacetCut();
+    error LibDiamondFacetHasNoCode(address facet);
+    error LibDiamondEmptySelectors();
+    error LibDiamondInitHasNoCode(address init);
     error LibDiamondInitReverted(bytes reason);
 
     function getDiamondStorage() internal pure returns (DiamondStorage storage ds) {
@@ -43,6 +47,7 @@ library LibDiamond {
     }
 
     function setContractOwner(address _owner) internal {
+        if (_owner == address(0)) revert LibDiamondInvalidOwner();
         DiamondStorage storage ds = getDiamondStorage();
         ds.contractOwner = _owner;
     }
@@ -72,6 +77,8 @@ library LibDiamond {
 
     function _addFacet(DiamondStorage storage ds, address facet, bytes4[] memory selectors) private {
         if (facet == address(0)) revert LibDiamondInvalidFacetCut();
+        if (selectors.length == 0) revert LibDiamondEmptySelectors();
+        if (facet.code.length == 0) revert LibDiamondFacetHasNoCode(facet);
         for (uint256 i = 0; i < selectors.length; i++) {
             bytes4 sel = selectors[i];
             if (ds.selectorToFacet[sel] != address(0)) revert LibDiamondSelectorAlreadyExists(sel);
@@ -81,6 +88,8 @@ library LibDiamond {
     }
 
     function _replaceFacet(DiamondStorage storage ds, address facet, bytes4[] memory selectors) private {
+        if (selectors.length == 0) revert LibDiamondEmptySelectors();
+        if (facet.code.length == 0) revert LibDiamondFacetHasNoCode(facet);
         for (uint256 i = 0; i < selectors.length; i++) {
             bytes4 sel = selectors[i];
             address oldFacet = ds.selectorToFacet[sel];
@@ -93,6 +102,7 @@ library LibDiamond {
     }
 
     function _removeFacet(DiamondStorage storage ds, bytes4[] memory selectors) private {
+        if (selectors.length == 0) revert LibDiamondEmptySelectors();
         address diamondAddress = address(this);
         for (uint256 i = 0; i < selectors.length; i++) {
             bytes4 sel = selectors[i];
@@ -138,6 +148,7 @@ library LibDiamond {
     }
 
     function _initDiamond(address init, bytes memory calldata_) private {
+        if (init.code.length == 0) revert LibDiamondInitHasNoCode(init);
         (bool success, bytes memory reason) = init.delegatecall(calldata_);
         if (!success) {
             if (reason.length > 0) {

@@ -27,6 +27,7 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
         LibDiamond.setContractOwner(_contractOwner);
 
         if (_diamondCut.length > 0) {
+            _rejectImmutableRemovalMemory(_diamondCut);
             LibDiamond.diamondCut(_diamondCut, address(0), "");
             emit DiamondCut(_diamondCut, address(0), "");
         }
@@ -81,6 +82,21 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
         for (uint256 i = 0; i < _diamondCut.length; i++) {
             if (_diamondCut[i].action != IDiamond.FacetCutAction.Remove) continue;
             bytes4[] calldata s = _diamondCut[i].functionSelectors;
+            for (uint256 j = 0; j < s.length; j++) {
+                if (
+                    s[j] == LOUPE_FACETS || s[j] == LOUPE_FACET_FUNCTION_SELECTORS || s[j] == LOUPE_FACET_ADDRESSES
+                        || s[j] == LOUPE_FACET_ADDRESS || s[j] == CUT_DIAMOND_CUT
+                ) {
+                    revert LibDiamond.LibDiamondImmutableSelector(s[j]);
+                }
+            }
+        }
+    }
+
+    function _rejectImmutableRemovalMemory(IDiamond.FacetCut[] memory _diamondCut) private pure {
+        for (uint256 i = 0; i < _diamondCut.length; i++) {
+            if (_diamondCut[i].action != IDiamond.FacetCutAction.Remove) continue;
+            bytes4[] memory s = _diamondCut[i].functionSelectors;
             for (uint256 j = 0; j < s.length; j++) {
                 if (
                     s[j] == LOUPE_FACETS || s[j] == LOUPE_FACET_FUNCTION_SELECTORS || s[j] == LOUPE_FACET_ADDRESSES

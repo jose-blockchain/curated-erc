@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.1] — 2026-02-23
+
+### Fixed
+
+- **ERC-2535 Diamond** — Security audit: reject zero owner; require facet and init contracts have code; reject empty selector arrays; reject removal of immutable selectors in constructor initial cut.
+
 ## [0.2.0] — 2026-02-23
 
 ### Added
