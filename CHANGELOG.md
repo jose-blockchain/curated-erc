@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.2.0] — 2026-02-23
+
+### Added
+
+- **ERC-2535** — Diamonds (multi-facet proxy): IDiamond, IDiamondCut, IDiamondLoupe, LibDiamond, Diamond.sol; loupe + cut immutable on proxy; full test suite and AGENT.md (forge fmt check).
+
 ## [0.1.0] — 2026-02-23
 
 Initial release. 11 ERCs implemented with non-upgradeable and upgradeable variants.
