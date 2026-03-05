@@ -41,14 +41,10 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
         cutSelectors[0] = CUT_DIAMOND_CUT;
         IDiamond.FacetCut[] memory immutableCut = new IDiamond.FacetCut[](2);
         immutableCut[0] = IDiamond.FacetCut({
-            facetAddress: address(this),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: loupeSelectors
+            facetAddress: address(this), action: IDiamond.FacetCutAction.Add, functionSelectors: loupeSelectors
         });
         immutableCut[1] = IDiamond.FacetCut({
-            facetAddress: address(this),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: cutSelectors
+            facetAddress: address(this), action: IDiamond.FacetCutAction.Add, functionSelectors: cutSelectors
         });
         emit DiamondCut(immutableCut, address(0), "");
     }
@@ -71,11 +67,10 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
     }
 
     /// @inheritdoc IDiamondCut
-    function diamondCut(
-        IDiamond.FacetCut[] calldata _diamondCut,
-        address _init,
-        bytes calldata _calldata
-    ) external override {
+    function diamondCut(IDiamond.FacetCut[] calldata _diamondCut, address _init, bytes calldata _calldata)
+        external
+        override
+    {
         LibDiamond.enforceIsContractOwner();
         _rejectImmutableRemoval(_diamondCut);
         LibDiamond.diamondCut(_diamondCut, _init, _calldata);
@@ -88,9 +83,8 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
             bytes4[] calldata s = _diamondCut[i].functionSelectors;
             for (uint256 j = 0; j < s.length; j++) {
                 if (
-                    s[j] == LOUPE_FACETS || s[j] == LOUPE_FACET_FUNCTION_SELECTORS
-                        || s[j] == LOUPE_FACET_ADDRESSES || s[j] == LOUPE_FACET_ADDRESS
-                        || s[j] == CUT_DIAMOND_CUT
+                    s[j] == LOUPE_FACETS || s[j] == LOUPE_FACET_FUNCTION_SELECTORS || s[j] == LOUPE_FACET_ADDRESSES
+                        || s[j] == LOUPE_FACET_ADDRESS || s[j] == CUT_DIAMOND_CUT
                 ) {
                     revert LibDiamond.LibDiamondImmutableSelector(s[j]);
                 }
@@ -111,7 +105,7 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
         for (uint256 i = 0; i < fromStorage.length; i++) {
             result[i] = fromStorage[i];
         }
-        result[fromStorage.length] = Facet({ facetAddress: address(this), functionSelectors: immutableSelectors });
+        result[fromStorage.length] = Facet({facetAddress: address(this), functionSelectors: immutableSelectors});
         return result;
     }
 
@@ -152,9 +146,8 @@ contract Diamond is IDiamond, IDiamondCut, IDiamondLoupe {
     /// @dev Returns facet for selector; address(this) for immutable selectors, else from storage.
     function _facetForSelector(bytes4 selector) internal view returns (address) {
         if (
-            selector == LOUPE_FACETS || selector == LOUPE_FACET_FUNCTION_SELECTORS
-                || selector == LOUPE_FACET_ADDRESSES || selector == LOUPE_FACET_ADDRESS
-                || selector == CUT_DIAMOND_CUT
+            selector == LOUPE_FACETS || selector == LOUPE_FACET_FUNCTION_SELECTORS || selector == LOUPE_FACET_ADDRESSES
+                || selector == LOUPE_FACET_ADDRESS || selector == CUT_DIAMOND_CUT
         ) {
             return address(this);
         }

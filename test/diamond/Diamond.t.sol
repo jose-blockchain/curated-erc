@@ -36,9 +36,7 @@ contract DiamondTest is Test {
         selectors[2] = TestFacet.add.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: selectors
+            facetAddress: address(facet), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
         });
         vm.prank(owner);
         IDiamondCut(address(diamond)).diamondCut(cut, address(0), "");
@@ -75,8 +73,7 @@ contract DiamondTest is Test {
     }
 
     function test_facetFunctionSelectors_diamond() public view {
-        bytes4[] memory s =
-            IDiamondLoupe(address(diamond)).facetFunctionSelectors(address(diamond));
+        bytes4[] memory s = IDiamondLoupe(address(diamond)).facetFunctionSelectors(address(diamond));
         assertEq(s.length, 5);
     }
 
@@ -97,8 +94,7 @@ contract DiamondTest is Test {
         _addTestFacet();
         address f = IDiamondLoupe(address(diamond)).facetAddress(TestFacet.setValue.selector);
         assertEq(f, address(facet));
-        bytes4[] memory s =
-            IDiamondLoupe(address(diamond)).facetFunctionSelectors(address(facet));
+        bytes4[] memory s = IDiamondLoupe(address(diamond)).facetFunctionSelectors(address(facet));
         assertEq(s.length, 3);
     }
 
@@ -107,9 +103,7 @@ contract DiamondTest is Test {
         selectors[0] = TestFacet.setValue.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: selectors
+            facetAddress: address(facet), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
         });
         vm.prank(stranger);
         vm.expectRevert(LibDiamond.LibDiamondOnlyOwner.selector);
@@ -122,9 +116,7 @@ contract DiamondTest is Test {
         selectors[0] = TestFacet.setValue.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet2),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: selectors
+            facetAddress: address(facet2), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
         });
         vm.prank(owner);
         vm.expectRevert(
@@ -145,9 +137,7 @@ contract DiamondTest is Test {
         selectors[1] = TestFacet.getValue.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet2),
-            action: IDiamond.FacetCutAction.Replace,
-            functionSelectors: selectors
+            facetAddress: address(facet2), action: IDiamond.FacetCutAction.Replace, functionSelectors: selectors
         });
         vm.prank(owner);
         IDiamondCut(address(diamond)).diamondCut(cut, address(0), "");
@@ -162,9 +152,7 @@ contract DiamondTest is Test {
         selectors[0] = TestFacet.setValue.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet2),
-            action: IDiamond.FacetCutAction.Replace,
-            functionSelectors: selectors
+            facetAddress: address(facet2), action: IDiamond.FacetCutAction.Replace, functionSelectors: selectors
         });
         vm.prank(owner);
         vm.expectRevert(
@@ -181,17 +169,13 @@ contract DiamondTest is Test {
         selectors[0] = TestFacet.add.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(0),
-            action: IDiamond.FacetCutAction.Remove,
-            functionSelectors: selectors
+            facetAddress: address(0), action: IDiamond.FacetCutAction.Remove, functionSelectors: selectors
         });
         vm.prank(owner);
         IDiamondCut(address(diamond)).diamondCut(cut, address(0), "");
 
         assertEq(IDiamondLoupe(address(diamond)).facetAddress(TestFacet.add.selector), address(0));
-        vm.expectRevert(
-            abi.encodeWithSelector(LibDiamond.LibDiamondSelectorNotFound.selector, TestFacet.add.selector)
-        );
+        vm.expectRevert(abi.encodeWithSelector(LibDiamond.LibDiamondSelectorNotFound.selector, TestFacet.add.selector));
         TestFacet(address(diamond)).add(1, 2);
     }
 
@@ -204,9 +188,7 @@ contract DiamondTest is Test {
         selectors[0] = IDiamondLoupe.facets.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(0),
-            action: IDiamond.FacetCutAction.Remove,
-            functionSelectors: selectors
+            facetAddress: address(0), action: IDiamond.FacetCutAction.Remove, functionSelectors: selectors
         });
         IDiamondCut(address(diamond)).diamondCut(cut, address(0), "");
     }
@@ -219,9 +201,7 @@ contract DiamondTest is Test {
         selectors[1] = TestFacet.getValue.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: selectors
+            facetAddress: address(facet), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
         });
         vm.prank(owner);
         Diamond d = new Diamond(owner, cut);
@@ -238,9 +218,7 @@ contract DiamondTest is Test {
         selectors[2] = TestFacet.init.selector;
         IDiamond.FacetCut[] memory cut = new IDiamond.FacetCut[](1);
         cut[0] = IDiamond.FacetCut({
-            facetAddress: address(facet),
-            action: IDiamond.FacetCutAction.Add,
-            functionSelectors: selectors
+            facetAddress: address(facet), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
         });
         bytes memory initCalldata = abi.encodeWithSelector(TestFacet.init.selector, 123);
         vm.prank(owner);

@@ -47,11 +47,7 @@ library LibDiamond {
         ds.contractOwner = _owner;
     }
 
-    function diamondCut(
-        IDiamond.FacetCut[] memory diamondCut_,
-        address init,
-        bytes memory calldata_
-    ) internal {
+    function diamondCut(IDiamond.FacetCut[] memory diamondCut_, address init, bytes memory calldata_) internal {
         DiamondStorage storage ds = getDiamondStorage();
         for (uint256 i = 0; i < diamondCut_.length; i++) {
             IDiamond.FacetCutAction action = diamondCut_[i].action;
@@ -160,10 +156,7 @@ library LibDiamond {
         address[] memory addrs = ds.facetAddresses;
         result = new IDiamondLoupe.Facet[](addrs.length);
         for (uint256 i = 0; i < addrs.length; i++) {
-            result[i] = IDiamondLoupe.Facet({
-                facetAddress: addrs[i],
-                functionSelectors: ds.facetSelectors[addrs[i]]
-            });
+            result[i] = IDiamondLoupe.Facet({facetAddress: addrs[i], functionSelectors: ds.facetSelectors[addrs[i]]});
         }
     }
 
