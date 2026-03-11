@@ -20,7 +20,7 @@ Foundry-native, Solidity-tested reference implementations of ERCs with strong co
 | ERC | Name | Status |
 |-----|------|--------|
 | 2535 | Diamonds (Multi-Facet Proxy) | ✅ Done |
-| 3525 | Semi-Fungible Token | 🔲 Not started |
+| 3525 | Semi-Fungible Token | ✅ Done |
 | 3643 | T-REX (Regulated Tokens) | 🔲 Not started |
 | 5564 | Stealth Addresses | 🔲 Not started |
 | 6538 | Stealth Meta-Address Registry | 🔲 Not started |

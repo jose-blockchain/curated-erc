@@ -31,6 +31,7 @@ Curated ERC Contracts fills that gap.
 | 4906 | Metadata Update Extension | Token (ERC-721 extension) |
 | 5484 | Consensual Soulbound Tokens | Token (ERC-721 extension) |
 | 2309 | Consecutive Transfer (Batch Mint) | Token (ERC-721 extension) |
+| 3525 | Semi-Fungible Token | Token (ERC-721 compatible) |
 | 1271 | Signature Validation for Contracts | Cryptography |
 | 6492 | Predeploy Signature Validation | Cryptography |
 | 2771 | Meta Transactions | Context / Gasless UX |
@@ -48,6 +49,7 @@ src/
 │   ├── ERC1363/          # Payable Token (transfer/approve with callbacks)
 │   ├── ERC2309/          # Consecutive Transfer (batch minting)
 │   ├── ERC4906/          # Metadata Update Extension
+│   ├── ERC3525/          # Semi-Fungible Token (slot + value model)
 │   ├── ERC4907/          # Rental NFT (user/owner split with expiry)
 │   ├── ERC5192/          # Soulbound NFT (non-transferable)
 │   └── ERC5484/          # Consensual Soulbound Tokens (burn authorization)
@@ -82,8 +84,16 @@ Then import and extend:
 
 ```solidity
 import {ERC1363} from "curated-erc/token/ERC1363/ERC1363.sol";
+import {ERC3525} from "curated-erc/token/ERC3525/ERC3525.sol";
 import {ERC5192} from "curated-erc/token/ERC5192/ERC5192.sol";
 import {ERC4907} from "curated-erc/token/ERC4907/ERC4907.sol";
+
+contract MySFT is ERC3525 {
+    constructor() ERC3525("MySFT", "MSFT", 18) {}
+    function mint(address to, uint256 slot, uint256 value) external returns (uint256) {
+        return _mint(to, slot, value);
+    }
+}
 
 contract MyPayableToken is ERC1363 {
     constructor() ERC20("MyToken", "MTK") {
