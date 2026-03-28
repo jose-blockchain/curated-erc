@@ -1,10 +1,18 @@
-<p align="center">
+﻿<p align="center">
   <img src="img/logo.jpg" alt="Curated ERC" width="400" />
 </p>
 
 # Curated ERC
 
 > v0.2.1
+
+<p align="center">
+  <a href="https://github.com/jose-compu/curated-erc/actions/workflows/test.yml"><img src="https://github.com/jose-compu/curated-erc/actions/workflows/test.yml/badge.svg" alt="CI" /></a>
+  <a href="https://github.com/jose-compu/curated-erc/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /></a>
+  <a href="https://soliditylang.org/"><img src="https://img.shields.io/badge/Solidity-%5E0.8.24-363636?logo=solidity" alt="Solidity" /></a>
+  <a href="https://book.getfoundry.sh/"><img src="https://img.shields.io/badge/built%20with-Foundry-FFDB1C" alt="Built with Foundry" /></a>
+  <a href="https://github.com/jose-compu/curated-erc/pulls"><img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome" /></a>
+</p>
 
 Canonical implementations of ERCs with real on-chain traction. Foundry-native, Solidity-tested.
 
@@ -68,7 +76,7 @@ Each ERC ships as:
 
 ## Installation
 
-### Foundry
+### Foundry (recommended)
 
 ```bash
 forge install jose-blockchain/curated-erc
@@ -102,33 +110,33 @@ contract MyPayableToken is ERC1363 {
 }
 ```
 
-### Hardhat
+### Hardhat + Foundry plugin
 
 The recommended path is the [`@nomicfoundation/hardhat-foundry`](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-foundry) plugin, which lets Hardhat read `remappings.txt` and resolve imports from the `lib/` folder directly — no duplicate OpenZeppelin installs.
 
 1. Install the plugin:
 
-```bash
-npm install --save-dev @nomicfoundation/hardhat-foundry
-```
+   ```bash
+   npm install --save-dev @nomicfoundation/hardhat-foundry
+   ```
 
 2. Add it to your `hardhat.config.ts`:
 
-```typescript
-import "@nomicfoundation/hardhat-foundry";
-```
+   ```typescript
+   import "@nomicfoundation/hardhat-foundry";
+   ```
 
 3. Clone curated-erc as a git submodule (same as Foundry):
 
-```bash
-forge install <your-github-user>/curated-erc
-```
+   ```bash
+   forge install <your-github-user>/curated-erc
+   ```
 
 4. Add the remapping to `remappings.txt`:
 
-```
-curated-erc/=lib/curated-erc/src/
-```
+   ```
+   curated-erc/=lib/curated-erc/src/
+   ```
 
 The plugin picks up remappings automatically. Imports work the same way as in Foundry:
 
@@ -136,28 +144,28 @@ The plugin picks up remappings automatically. Imports work the same way as in Fo
 import {ERC4907} from "curated-erc/token/ERC4907/ERC4907.sol";
 ```
 
-### Hardhat (npm)
+### Hardhat (npm only)
 
 If you use Hardhat without Foundry, install from npm and add OpenZeppelin as dependencies:
 
 1. Install the library and its peer dependencies:
 
-```bash
-npm install curated-erc @openzeppelin/contracts@5.5.0 @openzeppelin/contracts-upgradeable@5.5.0
-```
+   ```bash
+   npm install curated-erc @openzeppelin/contracts@5.5.0 @openzeppelin/contracts-upgradeable@5.5.0
+   ```
 
 2. Import and extend in your contracts:
 
-```solidity
-import {ERC1363} from "curated-erc/token/ERC1363/ERC1363.sol";
-import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+   ```solidity
+   import {ERC1363} from "curated-erc/token/ERC1363/ERC1363.sol";
+   import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MyPayableToken is ERC1363 {
-    constructor() ERC20("MyToken", "MTK") {
-        _mint(msg.sender, 1_000_000e18);
-    }
-}
-```
+   contract MyPayableToken is ERC1363 {
+       constructor() ERC20("MyToken", "MTK") {
+           _mint(msg.sender, 1_000_000e18);
+       }
+   }
+   ```
 
 Hardhat will compile the contracts in `node_modules/curated-erc` when resolving these imports; no extra config is needed. Use Solidity `^0.8.20` (e.g. `0.8.24`) in your `hardhat.config` to match the library.
 
