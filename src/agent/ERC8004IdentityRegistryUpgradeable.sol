@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {ERC721URIStorageUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import {
+    ERC721URIStorageUpgradeable
+} from "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {EIP712Upgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/EIP712Upgradeable.sol";
@@ -73,10 +74,7 @@ contract ERC8004IdentityRegistryUpgradeable is
     }
 
     /// @inheritdoc IERC8004IdentityRegistry
-    function register(string calldata agentURI, MetadataEntry[] calldata metadata)
-        external
-        returns (uint256 agentId)
-    {
+    function register(string calldata agentURI, MetadataEntry[] calldata metadata) external returns (uint256 agentId) {
         agentId = _mintAgent(msg.sender, agentURI);
         if (bytes(agentURI).length > 0) {
             _setTokenURI(agentId, agentURI);
@@ -178,8 +176,7 @@ contract ERC8004IdentityRegistryUpgradeable is
             return true;
         }
         if (wallet.code.length == 0) return false;
-        (bool ok, bytes memory res) =
-            wallet.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
+        (bool ok, bytes memory res) = wallet.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
         return ok && res.length >= 32 && abi.decode(res, (bytes4)) == _ERC1271_MAGIC_VALUE;
     }
 

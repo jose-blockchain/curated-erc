@@ -32,11 +32,13 @@ contract ERC8004ReputationRegistry is Ownable, IERC8004ReputationRegistry {
     address private _identityRegistry;
     mapping(uint256 agentId => mapping(address client => mapping(uint64 index => Feedback))) private _feedback;
     mapping(uint256 agentId => mapping(address client => uint64)) private _lastIndex;
-    mapping(uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => uint64))))
-        private _responseCount;
+    mapping(
+        uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => uint64)))
+    ) private _responseCount;
     mapping(uint256 agentId => mapping(address client => mapping(uint64 index => address[]))) private _responders;
-    mapping(uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => bool))))
-        private _responderExists;
+    mapping(
+        uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => bool)))
+    ) private _responderExists;
     mapping(uint256 agentId => address[]) private _clients;
     mapping(uint256 agentId => mapping(address client => bool)) private _clientExists;
 
@@ -86,7 +88,19 @@ contract ERC8004ReputationRegistry is Ownable, IERC8004ReputationRegistry {
             _clientExists[agentId][msg.sender] = true;
         }
 
-        emit NewFeedback(agentId, msg.sender, currentIndex, fb.value, fb.valueDecimals, tag1, tag1, fb.tag2, endpoint, feedbackURI, feedbackHash);
+        emit NewFeedback(
+            agentId,
+            msg.sender,
+            currentIndex,
+            fb.value,
+            fb.valueDecimals,
+            tag1,
+            tag1,
+            fb.tag2,
+            endpoint,
+            feedbackURI,
+            feedbackHash
+        );
     }
 
     /// @inheritdoc IERC8004ReputationRegistry

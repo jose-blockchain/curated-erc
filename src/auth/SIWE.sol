@@ -60,8 +60,7 @@ library SIWE {
         if (account.code.length == 0) {
             return false;
         }
-        (bool ok, bytes memory res) =
-            account.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
+        (bool ok, bytes memory res) = account.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
         return ok && res.length >= 32 && abi.decode(res, (bytes4)) == _ERC1271_MAGIC_VALUE;
     }
 
@@ -164,9 +163,7 @@ library SIWE {
     }
 
     function _containsDomain(string memory message, string memory domain) private pure returns (bool) {
-        return _containsLiteral(
-            message, string.concat(domain, " wants you to sign in with your Ethereum account:")
-        );
+        return _containsLiteral(message, string.concat(domain, " wants you to sign in with your Ethereum account:"));
     }
 
     function _containsLiteral(string memory haystack, string memory needle) private pure returns (bool) {

@@ -157,11 +157,7 @@ contract ERC8004ValidationRegistry is Ownable, IERC8004ValidationRegistry {
         return _validatorRequests[validatorAddress];
     }
 
-    function _matchesValidator(address validator, address[] calldata validatorAddresses)
-        private
-        pure
-        returns (bool)
-    {
+    function _matchesValidator(address validator, address[] calldata validatorAddresses) private pure returns (bool) {
         if (validatorAddresses.length == 0) return true;
         for (uint256 j; j < validatorAddresses.length; j++) {
             if (validator == validatorAddresses[j]) return true;

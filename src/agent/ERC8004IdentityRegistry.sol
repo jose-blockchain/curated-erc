@@ -46,10 +46,7 @@ contract ERC8004IdentityRegistry is ERC721URIStorage, Ownable, EIP712, IERC8004I
     }
 
     /// @inheritdoc IERC8004IdentityRegistry
-    function register(string calldata agentURI, MetadataEntry[] calldata metadata)
-        external
-        returns (uint256 agentId)
-    {
+    function register(string calldata agentURI, MetadataEntry[] calldata metadata) external returns (uint256 agentId) {
         agentId = _mintAgent(msg.sender, agentURI);
         if (bytes(agentURI).length > 0) {
             _setTokenURI(agentId, agentURI);
@@ -149,8 +146,7 @@ contract ERC8004IdentityRegistry is ERC721URIStorage, Ownable, EIP712, IERC8004I
             return true;
         }
         if (wallet.code.length == 0) return false;
-        (bool ok, bytes memory res) =
-            wallet.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
+        (bool ok, bytes memory res) = wallet.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
         return ok && res.length >= 32 && abi.decode(res, (bytes4)) == _ERC1271_MAGIC_VALUE;
     }
 

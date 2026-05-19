@@ -121,18 +121,21 @@ contract ERC8004Test is Test {
 
     function test_register_reservedMetadataInArrayReverts() public {
         IERC8004IdentityRegistry.MetadataEntry[] memory entries = new IERC8004IdentityRegistry.MetadataEntry[](1);
-        entries[0] =
-            IERC8004IdentityRegistry.MetadataEntry({metadataKey: "agentWallet", metadataValue: hex"01"});
+        entries[0] = IERC8004IdentityRegistry.MetadataEntry({metadataKey: "agentWallet", metadataValue: hex"01"});
 
         vm.prank(owner);
-        vm.expectRevert(abi.encodeWithSelector(ERC8004IdentityRegistry.ERC8004ReservedMetadataKey.selector, "agentWallet"));
+        vm.expectRevert(
+            abi.encodeWithSelector(ERC8004IdentityRegistry.ERC8004ReservedMetadataKey.selector, "agentWallet")
+        );
         identity.register("ipfs://x", entries);
     }
 
     function test_setMetadata_reservedKeyReverts() public {
         uint256 agentId = _register(owner);
         vm.prank(owner);
-        vm.expectRevert(abi.encodeWithSelector(ERC8004IdentityRegistry.ERC8004ReservedMetadataKey.selector, "agentWallet"));
+        vm.expectRevert(
+            abi.encodeWithSelector(ERC8004IdentityRegistry.ERC8004ReservedMetadataKey.selector, "agentWallet")
+        );
         identity.setMetadata(agentId, "agentWallet", hex"01");
     }
 
@@ -271,7 +274,9 @@ contract ERC8004Test is Test {
     function test_giveFeedback_selfFeedbackReverts() public {
         uint256 agentId = _register(owner);
         vm.prank(owner);
-        vm.expectRevert(abi.encodeWithSelector(ERC8004ReputationRegistry.ERC8004SelfFeedbackNotAllowed.selector, agentId));
+        vm.expectRevert(
+            abi.encodeWithSelector(ERC8004ReputationRegistry.ERC8004SelfFeedbackNotAllowed.selector, agentId)
+        );
         reputation.giveFeedback(agentId, 1, 0, "", "", "", "", bytes32(0));
     }
 
@@ -281,7 +286,9 @@ contract ERC8004Test is Test {
         identity.setApprovalForAll(operator, true);
 
         vm.prank(operator);
-        vm.expectRevert(abi.encodeWithSelector(ERC8004ReputationRegistry.ERC8004SelfFeedbackNotAllowed.selector, agentId));
+        vm.expectRevert(
+            abi.encodeWithSelector(ERC8004ReputationRegistry.ERC8004SelfFeedbackNotAllowed.selector, agentId)
+        );
         reputation.giveFeedback(agentId, 1, 0, "", "", "", "", bytes32(0));
     }
 

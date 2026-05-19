@@ -35,11 +35,13 @@ contract ERC8004ReputationRegistryUpgradeable is Initializable, OwnableUpgradeab
         address identityRegistry;
         mapping(uint256 agentId => mapping(address client => mapping(uint64 index => Feedback))) feedback;
         mapping(uint256 agentId => mapping(address client => uint64)) lastIndex;
-        mapping(uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => uint64))))
-            responseCount;
+        mapping(
+            uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => uint64)))
+        ) responseCount;
         mapping(uint256 agentId => mapping(address client => mapping(uint64 index => address[]))) responders;
-        mapping(uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => bool))))
-            responderExists;
+        mapping(
+            uint256 agentId => mapping(address client => mapping(uint64 index => mapping(address responder => bool)))
+        ) responderExists;
         mapping(uint256 agentId => address[]) clients;
         mapping(uint256 agentId => mapping(address client => bool)) clientExists;
     }
@@ -104,13 +106,27 @@ contract ERC8004ReputationRegistryUpgradeable is Initializable, OwnableUpgradeab
             $.clientExists[agentId][msg.sender] = true;
         }
 
-        emit NewFeedback(agentId, msg.sender, currentIndex, fb.value, fb.valueDecimals, tag1, tag1, fb.tag2, endpoint, feedbackURI, feedbackHash);
+        emit NewFeedback(
+            agentId,
+            msg.sender,
+            currentIndex,
+            fb.value,
+            fb.valueDecimals,
+            tag1,
+            tag1,
+            fb.tag2,
+            endpoint,
+            feedbackURI,
+            feedbackHash
+        );
     }
 
     /// @inheritdoc IERC8004ReputationRegistry
     function revokeFeedback(uint256 agentId, uint64 feedbackIndex) external {
         ERC8004ReputationStorage storage $ = _getERC8004ReputationStorage();
-        if (feedbackIndex == 0 || feedbackIndex > $.lastIndex[agentId][msg.sender]) revert ERC8004InvalidFeedbackIndex();
+        if (feedbackIndex == 0 || feedbackIndex > $.lastIndex[agentId][msg.sender]) {
+            revert ERC8004InvalidFeedbackIndex();
+        }
         Feedback storage fb = $.feedback[agentId][msg.sender][feedbackIndex];
         if (fb.isRevoked) revert ERC8004FeedbackAlreadyRevoked();
         fb.isRevoked = true;

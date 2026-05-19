@@ -12,7 +12,9 @@ interface IERC8004IdentityRegistry {
     }
 
     event Registered(uint256 indexed agentId, string agentURI, address indexed owner);
-    event MetadataSet(uint256 indexed agentId, string indexed indexedMetadataKey, string metadataKey, bytes metadataValue);
+    event MetadataSet(
+        uint256 indexed agentId, string indexed indexedMetadataKey, string metadataKey, bytes metadataValue
+    );
     event URIUpdated(uint256 indexed agentId, string newURI, address indexed updatedBy);
 
     function register() external returns (uint256 agentId);
