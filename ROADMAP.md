@@ -24,7 +24,7 @@ Foundry-native, Solidity-tested reference implementations of ERCs with strong co
 | 3643 | T-REX (Regulated Tokens) | 🔲 Not started |
 | 5564 | Stealth Addresses | 🔲 Not started |
 | 6538 | Stealth Meta-Address Registry | 🔲 Not started |
-| 4361 | Sign-In with Ethereum (SIWE Verifier) | 🔲 Not started |
+| 4361 | Sign-In with Ethereum (SIWE Verifier) | ✅ Done |
 | 7631 | Dual Nature Token Pair (DN404) | 🔲 Not started |
 
 ## Phase 3 — Tier 3 (Niche, Growing)
@@ -39,7 +39,17 @@ Foundry-native, Solidity-tested reference implementations of ERCs with strong co
 | 5006 | Rental NFT (ERC-1155) | 🔲 Not started |
 | 3668 | CCIP Read (Offchain Data) | 🔲 Not started |
 
-## Phase 4 — Tier 4 (Emerging)
+## Phase 4 — AI Agents & Agentic Economy
+
+| ERC | Name | Status |
+|-----|------|--------|
+| 8004 | Trustless Agents (Identity / Reputation / Validation) | ✅ Done |
+| 7857 | AI Agents NFT with Private Metadata | 🔲 Not started |
+| 6551 | Token Bound Accounts (Agent Wallets) | 🔲 Not started |
+| 7677 | Agent Atomic Transactions | 🔲 Not started |
+| 7943 | Agent Coordination (Multi-Agent Sessions) | 🔲 Not started |
+
+## Phase 5 — Tier 4 (Emerging)
 
 | ERC | Name | Status |
 |-----|------|--------|

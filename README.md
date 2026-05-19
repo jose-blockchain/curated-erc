@@ -4,7 +4,7 @@
 
 # Curated ERC
 
-> v0.2.1
+> v0.4.0
 
 Canonical implementations of ERCs with real on-chain traction. Foundry-native, Solidity-tested.
 
@@ -38,8 +38,10 @@ Curated ERC Contracts fills that gap.
 | 3156 | Flash Loans | DeFi / Finance |
 | 7201 | Namespaced Storage Layout | Utils / Upgrades |
 | 2535 | Diamonds (Multi-Facet Proxy) | Proxy / Upgrades |
+| 4361 | Sign-In with Ethereum | Auth / Identity |
+| 8004 | Trustless Agents | AI Agents (identity, reputation, validation) |
 
-Full plan across 40 ERCs in [ROADMAP.md](./ROADMAP.md). Release history in [CHANGELOG.md](./CHANGELOG.md).
+15 standards implemented (non-upgradeable + upgradeable where applicable). Full plan across 40+ ERCs in [ROADMAP.md](./ROADMAP.md). Release history in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Structure
 
@@ -56,15 +58,24 @@ src/
 ├── metatx/               # ERC-2771 Trusted Forwarder context
 ├── finance/              # ERC-3156 Flash Loan lender
 ├── diamond/              # ERC-2535 Diamonds (multi-facet proxy)
+├── auth/                 # ERC-4361 Sign-In with Ethereum
+│   ├── SIWE.sol          # Library: ERC-191 hash, verify, parse address
+│   └── SIWEVerifier.sol  # Stateless on-chain verifier contract
+├── agent/                # ERC-8004 Trustless Agents
+│   ├── ERC8004IdentityRegistry(.sol|Upgradeable.sol)
+│   ├── ERC8004ReputationRegistry(.sol|Upgradeable.sol)
+│   └── ERC8004ValidationRegistry(.sol|Upgradeable.sol)
 └── utils/
     ├── cryptography/     # ERC-1271 + ERC-6492 Signature validation
     └── StorageSlot7201.sol
 ```
 
-Each ERC ships as:
+Each ERC typically ships as:
 - `IERC*.sol` — Standard interface
-- `ERC*.sol` — Non-upgradeable implementation
-- `ERC*Upgradeable.sol` — Upgradeable (Initializable + ERC-7201 storage)
+- `ERC*.sol` — Non-upgradeable implementation (abstract base or deployable contract)
+- `ERC*Upgradeable.sol` — Upgradeable (Initializable + ERC-7201 namespaced storage)
+
+Exceptions: **ERC-4361** exposes a library (`SIWE`) plus `SIWEVerifier`; **ERC-6492** and **ERC-7201** are libraries/utilities; **ERC-8004** ships three deployable registry contracts per variant.
 
 ## Installation
 
@@ -102,6 +113,47 @@ contract MyPayableToken is ERC1363 {
 }
 ```
 
+**ERC-4361 (SIWE)** — verify a signed login message on-chain:
+
+```solidity
+import {SIWE} from "curated-erc/auth/SIWE.sol";
+import {SIWEVerifier} from "curated-erc/auth/SIWEVerifier.sol";
+
+// Library (inline in your contract)
+SIWE.VerificationParams memory params = SIWE.VerificationParams({
+    message: siweMessage,
+    signature: sig,
+    signer: address(0),       // parse address from message
+    chainId: block.chainid,
+    domain: "app.example.com",
+    nonce: expectedNonce,
+    issuedAt: 0,
+    expirationTime: expiry,
+    notBefore: 0
+});
+address user = SIWE.verify(params);
+
+// Or use the standalone verifier (emits SIWEVerified)
+SIWEVerifier verifier = new SIWEVerifier();
+address user = verifier.verify(params);
+```
+
+**ERC-8004 (Trustless Agents)** — deploy the three registries as chain singletons:
+
+```solidity
+import {ERC8004IdentityRegistry} from "curated-erc/agent/ERC8004IdentityRegistry.sol";
+import {ERC8004ReputationRegistry} from "curated-erc/agent/ERC8004ReputationRegistry.sol";
+import {ERC8004ValidationRegistry} from "curated-erc/agent/ERC8004ValidationRegistry.sol";
+
+ERC8004IdentityRegistry identity = new ERC8004IdentityRegistry();
+ERC8004ReputationRegistry reputation =
+    new ERC8004ReputationRegistry(address(identity), msg.sender);
+ERC8004ValidationRegistry validation =
+    new ERC8004ValidationRegistry(address(identity), msg.sender);
+
+uint256 agentId = identity.register("ipfs://agent-registration.json");
+```
+
 ### Hardhat
 
 The recommended path is the [`@nomicfoundation/hardhat-foundry`](https://hardhat.org/hardhat-runner/plugins/nomicfoundation-hardhat-foundry) plugin, which lets Hardhat read `remappings.txt` and resolve imports from the `lib/` folder directly — no duplicate OpenZeppelin installs.
@@ -134,6 +186,8 @@ The plugin picks up remappings automatically. Imports work the same way as in Fo
 
 ```solidity
 import {ERC4907} from "curated-erc/token/ERC4907/ERC4907.sol";
+import {SIWEVerifier} from "curated-erc/auth/SIWEVerifier.sol";
+import {ERC8004IdentityRegistry} from "curated-erc/agent/ERC8004IdentityRegistry.sol";
 ```
 
 ### Hardhat (npm)
@@ -165,8 +219,8 @@ Hardhat will compile the contracts in `node_modules/curated-erc` when resolving 
 
 ```bash
 forge install
-forge build
-forge test -vv
+forge build    # via-ir enabled for stack-heavy registry contracts
+forge test -vv # 261+ tests (unit + fuzz)
 ```
 
 ## Dependencies

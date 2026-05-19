@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.4.0] — 2026-05-19
+
+### Added
+
+- **ERC-4361** — Sign-In with Ethereum: `SIWE` library, `SIWEVerifier` contract (ERC-191 signature + domain/chain/nonce/expiry checks)
+- **ERC-8004** — Trustless Agents: Identity Registry (ERC-721 + metadata + EIP-712 agent wallet), Reputation Registry, Validation Registry (non-upgradeable + upgradeable)
+
+### Changed
+
+- Enabled `via_ir` in Foundry profile to compile stack-heavy registry contracts
+
 ## [0.2.1] — 2026-02-23
 
 ### Fixed
