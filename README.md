@@ -4,7 +4,7 @@
 
 # Curated ERC
 
-> v0.4.0
+> v0.4.1
 
 Canonical implementations of ERCs with real on-chain traction. Foundry-native, Solidity-tested.
 
@@ -82,7 +82,7 @@ Exceptions: **ERC-4361** exposes a library (`SIWE`) plus `SIWEVerifier`; **ERC-6
 ### Foundry
 
 ```bash
-forge install jose-blockchain/curated-erc
+forge install jose-compu/curated-erc
 ```
 
 Add the remapping to your `remappings.txt`:
