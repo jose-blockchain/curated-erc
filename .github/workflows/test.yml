@@ -4,35 +4,56 @@ permissions: {}
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   FOUNDRY_PROFILE: ci
 
 jobs:
-  check:
-    name: Foundry project
+  test:
+    name: Forge
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - name: Checkout
+        uses: actions/checkout@v5
         with:
           persist-credentials: false
           submodules: recursive
 
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: stable
 
       - name: Show Forge version
         run: forge --version
 
-      - name: Run Forge fmt
+      - name: Cache Forge artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            cache
+            out
+          key: forge-${{ runner.os }}-${{ hashFiles('foundry.toml', 'foundry.lock', 'remappings.txt') }}-${{ hashFiles('src/**/*.sol', 'test/**/*.sol', 'lib/**/*.sol') }}
+          restore-keys: |
+            forge-${{ runner.os }}-${{ hashFiles('foundry.toml', 'foundry.lock', 'remappings.txt') }}-
+            forge-${{ runner.os }}-
+
+      - name: Check formatting
         run: forge fmt --check
 
-      - name: Run Forge build
+      - name: Build
         run: forge build --sizes
 
-      - name: Run Forge tests
+      - name: Test
         run: forge test -vvv
