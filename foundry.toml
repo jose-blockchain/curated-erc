@@ -18,3 +18,7 @@ max_test_rejects = 100000
 [invariant]
 runs = 256
 depth = 128
+
+[profile.ci]
+fuzz = { runs = 256 }
+invariant = { runs = 64, depth = 64 }
