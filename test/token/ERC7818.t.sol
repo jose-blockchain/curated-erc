@@ -114,11 +114,15 @@ contract ERC7818Test is Test {
     }
 
     function test_balanceOf_partialExpiry() public {
+        (uint256 genesis,) = token.getEpochInfo(0);
         token.mint(alice, 600e18);
-        vm.warp(block.timestamp + EPOCH);
+        vm.warp(genesis + EPOCH);
         token.mint(alice, 400e18);
-        vm.warp(block.timestamp + EPOCH); // epoch 2: epoch 0 expired
+        vm.warp(genesis + 2 * EPOCH); // epoch 2: epoch 0 expired, epoch 1 still valid
 
+        assertEq(token.currentEpoch(), 2);
+        assertEq(token.balanceOfAtEpoch(0, alice), 0);
+        assertEq(token.balanceOfAtEpoch(1, alice), 400e18);
         assertEq(token.balanceOf(alice), 400e18);
     }
 
@@ -304,11 +308,13 @@ contract ERC7818Test is Test {
     }
 
     function test_batchExpiry_laterEpochUnaffected() public {
+        (uint256 genesis,) = token.getEpochInfo(0);
         token.mint(alice, 1000e18);
-        vm.warp(block.timestamp + EPOCH);
+        vm.warp(genesis + EPOCH);
         token.mint(bob, 500e18);
-        vm.warp(block.timestamp + EPOCH); // epoch 2
+        vm.warp(genesis + 2 * EPOCH); // epoch 2
 
+        assertEq(token.currentEpoch(), 2);
         assertEq(token.balanceOf(alice), 0, "epoch 0 expired");
         assertEq(token.balanceOf(bob), 500e18, "epoch 1 still valid");
     }
