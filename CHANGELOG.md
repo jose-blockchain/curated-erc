@@ -1,5 +1,27 @@
 # Changelog
 
+## [0.4.1] — 2026-07-21
+
+### Fixed
+
+- **npm publish** — `scripts/copy-src-to-root.js` now copies `auth/`, `agent/`, and `diamond/` so ERC-4361 (SIWE), ERC-8004, and ERC-2535 resolve for Hardhat/npm consumers (`curated-erc/auth/...`, etc.)
+- **package metadata** — repository URL updated to `jose-compu/curated-erc`
+
+### Notes
+
+- Closes [#24](https://github.com/jose-compu/curated-erc/issues/24): ERC-4361 SIWE verifier shipped in 0.4.0; this patch ensures the `auth` tree is included in the published npm package.
+
+## [0.4.0] — 2026-05-19
+
+### Added
+
+- **ERC-4361** — Sign-In with Ethereum: `SIWE` library, `SIWEVerifier` contract (ERC-191 signature + domain/chain/nonce/expiry checks)
+- **ERC-8004** — Trustless Agents: Identity Registry (ERC-721 + metadata + EIP-712 agent wallet), Reputation Registry, Validation Registry (non-upgradeable + upgradeable)
+
+### Changed
+
+- Enabled `via_ir` in Foundry profile to compile stack-heavy registry contracts
+
 ## [0.2.1] — 2026-02-23
 
 ### Fixed

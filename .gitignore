@@ -3,6 +3,9 @@
 /metatx
 /finance
 /utils
+/auth
+/agent
+/diamond
 
 # Foundry
 cache/
