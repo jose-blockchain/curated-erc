@@ -33,12 +33,12 @@ contract MockToken is ERC7818 {
 // -----------------------------------------------------------------------------
 
 contract ERC7818Test is Test {
-    uint256 constant EPOCH  = 7 days;
-    uint256 constant VALID  = 2;
+    uint256 constant EPOCH = 7 days;
+    uint256 constant VALID = 2;
     uint256 constant AMOUNT = 1000e18;
 
     address alice = makeAddr("alice");
-    address bob   = makeAddr("bob");
+    address bob = makeAddr("bob");
 
     MockToken token;
 
@@ -52,10 +52,10 @@ contract ERC7818Test is Test {
     // =========================================================================
 
     function test_metadata() public view {
-        assertEq(token.name(),           "Mock");
-        assertEq(token.symbol(),         "MCK");
-        assertEq(token.decimals(),       18);
-        assertEq(token.epochDuration(),  EPOCH);
+        assertEq(token.name(), "Mock");
+        assertEq(token.symbol(), "MCK");
+        assertEq(token.decimals(), 18);
+        assertEq(token.epochDuration(), EPOCH);
         assertEq(token.validityPeriod(), VALID);
         assertEq(uint8(token.epochType()), uint8(IERC7818.EPOCH_TYPE.TIME_BASED));
     }
@@ -71,7 +71,7 @@ contract ERC7818Test is Test {
     function test_mint_balanceAndSupply() public {
         token.mint(alice, AMOUNT);
         assertEq(token.balanceOf(alice), AMOUNT);
-        assertEq(token.totalSupply(),    AMOUNT);
+        assertEq(token.totalSupply(), AMOUNT);
     }
 
     function test_mint_emitsMintedInEpoch() public {
@@ -91,15 +91,15 @@ contract ERC7818Test is Test {
         vm.warp(block.timestamp + EPOCH);
         token.mint(alice, 400e18);
 
-        assertEq(token.balanceOf(alice),           1000e18);
-        assertEq(token.balanceOfAtEpoch(0, alice),  600e18);
-        assertEq(token.balanceOfAtEpoch(1, alice),  400e18);
+        assertEq(token.balanceOf(alice), 1000e18);
+        assertEq(token.balanceOfAtEpoch(0, alice), 600e18);
+        assertEq(token.balanceOfAtEpoch(1, alice), 400e18);
     }
 
     function test_mint_zeroNoEffect() public {
         token.mint(alice, 0);
         assertEq(token.balanceOf(alice), 0);
-        assertEq(token.totalSupply(),    0);
+        assertEq(token.totalSupply(), 0);
     }
 
     // =========================================================================
@@ -109,7 +109,7 @@ contract ERC7818Test is Test {
     function test_balanceOf_zeroAfterExpiry() public {
         token.mint(alice, AMOUNT);
         vm.warp(block.timestamp + EPOCH * VALID);
-        assertEq(token.currentEpoch(),   2);
+        assertEq(token.currentEpoch(), 2);
         assertEq(token.balanceOf(alice), 0);
     }
 
@@ -143,7 +143,7 @@ contract ERC7818Test is Test {
         vm.prank(alice);
         token.transfer(bob, 300e18);
         assertEq(token.balanceOf(alice), 700e18);
-        assertEq(token.balanceOf(bob),   300e18);
+        assertEq(token.balanceOf(bob), 300e18);
     }
 
     function test_transfer_emitsEvent() public {
@@ -169,8 +169,8 @@ contract ERC7818Test is Test {
         vm.prank(alice);
         token.transfer(bob, 350e18);
 
-        assertEq(token.balanceOfAtEpoch(0, alice),   0,      "epoch 0 fully consumed");
-        assertEq(token.balanceOfAtEpoch(1, alice), 450e18,   "epoch 1 partially consumed");
+        assertEq(token.balanceOfAtEpoch(0, alice), 0, "epoch 0 fully consumed");
+        assertEq(token.balanceOfAtEpoch(1, alice), 450e18, "epoch 1 partially consumed");
     }
 
     function test_transfer_fullBalance() public {
@@ -178,7 +178,7 @@ contract ERC7818Test is Test {
         vm.prank(alice);
         token.transfer(bob, AMOUNT);
         assertEq(token.balanceOf(alice), 0);
-        assertEq(token.balanceOf(bob),   AMOUNT);
+        assertEq(token.balanceOf(bob), AMOUNT);
     }
 
     function test_transfer_zeroSucceeds() public {
@@ -212,13 +212,7 @@ contract ERC7818Test is Test {
         token.mint(alice, AMOUNT);
         vm.warp(block.timestamp + EPOCH * VALID);
         vm.prank(alice);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC7818.ERC7818TransferredExpiredToken.selector,
-                alice,
-                uint256(0)
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC7818.ERC7818TransferredExpiredToken.selector, alice, uint256(0)));
         token.transfer(alice, 1);
     }
 
@@ -227,10 +221,7 @@ contract ERC7818Test is Test {
         vm.prank(alice);
         vm.expectRevert(
             abi.encodeWithSelector(
-                IERC7818.ERC7818InsufficientActiveBalance.selector,
-                alice,
-                uint256(50e18),
-                uint256(100e18)
+                IERC7818.ERC7818InsufficientActiveBalance.selector, alice, uint256(50e18), uint256(100e18)
             )
         );
         token.transfer(alice, 100e18);
@@ -245,13 +236,7 @@ contract ERC7818Test is Test {
         vm.warp(block.timestamp + EPOCH * VALID);
 
         vm.prank(alice);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC7818.ERC7818TransferredExpiredToken.selector,
-                alice,
-                uint256(0)
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC7818.ERC7818TransferredExpiredToken.selector, alice, uint256(0)));
         token.transfer(bob, 1);
     }
 
@@ -260,10 +245,7 @@ contract ERC7818Test is Test {
         vm.prank(alice);
         vm.expectRevert(
             abi.encodeWithSelector(
-                IERC7818.ERC7818InsufficientActiveBalance.selector,
-                alice,
-                uint256(50e18),
-                uint256(100e18)
+                IERC7818.ERC7818InsufficientActiveBalance.selector, alice, uint256(50e18), uint256(100e18)
             )
         );
         token.transfer(bob, 100e18);
@@ -282,7 +264,7 @@ contract ERC7818Test is Test {
         token.transferFrom(alice, bob, 200e18);
 
         assertEq(token.balanceOf(alice), 800e18);
-        assertEq(token.balanceOf(bob),   200e18);
+        assertEq(token.balanceOf(bob), 200e18);
         assertEq(token.allowance(alice, bob), 0);
     }
 
@@ -304,12 +286,7 @@ contract ERC7818Test is Test {
 
         vm.prank(bob);
         vm.expectRevert(
-            abi.encodeWithSelector(
-                ERC7818.ERC7818InsufficientAllowance.selector,
-                bob,
-                uint256(100e18),
-                uint256(200e18)
-            )
+            abi.encodeWithSelector(ERC7818.ERC7818InsufficientAllowance.selector, bob, uint256(100e18), uint256(200e18))
         );
         token.transferFrom(alice, bob, 200e18);
     }
@@ -320,10 +297,10 @@ contract ERC7818Test is Test {
 
     function test_batchExpiry_multipleAccounts() public {
         token.mint(alice, 1000e18);
-        token.mint(bob,    500e18);
+        token.mint(bob, 500e18);
         vm.warp(block.timestamp + EPOCH * VALID);
         assertEq(token.balanceOf(alice), 0);
-        assertEq(token.balanceOf(bob),   0);
+        assertEq(token.balanceOf(bob), 0);
     }
 
     function test_batchExpiry_laterEpochUnaffected() public {
@@ -332,8 +309,8 @@ contract ERC7818Test is Test {
         token.mint(bob, 500e18);
         vm.warp(block.timestamp + EPOCH); // epoch 2
 
-        assertEq(token.balanceOf(alice), 0,       "epoch 0 expired");
-        assertEq(token.balanceOf(bob),   500e18,  "epoch 1 still valid");
+        assertEq(token.balanceOf(alice), 0, "epoch 0 expired");
+        assertEq(token.balanceOf(bob), 500e18, "epoch 1 still valid");
     }
 
     // =========================================================================
@@ -344,19 +321,13 @@ contract ERC7818Test is Test {
         token.mint(alice, AMOUNT);
         token.burn(alice, 400e18);
         assertEq(token.balanceOf(alice), 600e18);
-        assertEq(token.totalSupply(),    600e18);
+        assertEq(token.totalSupply(), 600e18);
     }
 
     function test_burn_revertsExpired() public {
         token.mint(alice, AMOUNT);
         vm.warp(block.timestamp + EPOCH * VALID);
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                IERC7818.ERC7818TransferredExpiredToken.selector,
-                alice,
-                uint256(0)
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(IERC7818.ERC7818TransferredExpiredToken.selector, alice, uint256(0)));
         token.burn(alice, 1);
     }
 
@@ -364,10 +335,7 @@ contract ERC7818Test is Test {
         token.mint(alice, 50e18);
         vm.expectRevert(
             abi.encodeWithSelector(
-                IERC7818.ERC7818InsufficientActiveBalance.selector,
-                alice,
-                uint256(50e18),
-                uint256(100e18)
+                IERC7818.ERC7818InsufficientActiveBalance.selector, alice, uint256(50e18), uint256(100e18)
             )
         );
         token.burn(alice, 100e18);

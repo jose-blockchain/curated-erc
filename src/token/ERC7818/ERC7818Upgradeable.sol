@@ -16,12 +16,7 @@ import {IERC7818} from "./IERC7818.sol";
  * Uses ERC-7201 namespaced storage so the layout is stable across upgrades
  * and cannot collide with proxy or other extension slots.
  */
-abstract contract ERC7818Upgradeable is
-    Initializable,
-    ContextUpgradeable,
-    IERC7818,
-    IERC20Metadata
-{
+abstract contract ERC7818Upgradeable is Initializable, ContextUpgradeable, IERC7818, IERC20Metadata {
     // -------------------------------------------------------------------------
     // Errors
     // -------------------------------------------------------------------------
@@ -30,11 +25,7 @@ abstract contract ERC7818Upgradeable is
     error ERC7818InvalidSender(address sender);
     error ERC7818InvalidApprover(address approver);
     error ERC7818InvalidSpender(address spender);
-    error ERC7818InsufficientAllowance(
-        address spender,
-        uint256 allowance,
-        uint256 needed
-    );
+    error ERC7818InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
 
     // -------------------------------------------------------------------------
     // ERC-7201 namespaced storage
@@ -61,11 +52,7 @@ abstract contract ERC7818Upgradeable is
     bytes32 private constant ERC7818StorageLocation =
         0x4e5f991bca30eca2d4643aea16e7974d6012cd52f0dbd1a6b41c79a5e9b59800;
 
-    function _getERC7818Storage()
-        private
-        pure
-        returns (ERC7818Storage storage $)
-    {
+    function _getERC7818Storage() private pure returns (ERC7818Storage storage $) {
         assembly {
             $.slot := ERC7818StorageLocation
         }
@@ -83,13 +70,7 @@ abstract contract ERC7818Upgradeable is
         EPOCH_TYPE epochType_
     ) internal onlyInitializing {
         __Context_init();
-        __ERC7818_init_unchained(
-            name_,
-            symbol_,
-            epochDuration_,
-            validityPeriod_,
-            epochType_
-        );
+        __ERC7818_init_unchained(name_, symbol_, epochDuration_, validityPeriod_, epochType_);
     }
 
     function __ERC7818_init_unchained(
@@ -100,8 +81,9 @@ abstract contract ERC7818Upgradeable is
         EPOCH_TYPE epochType_
     ) internal onlyInitializing {
         if (epochDuration_ == 0) revert("ERC7818: epochDuration must be > 0");
-        if (validityPeriod_ == 0)
+        if (validityPeriod_ == 0) {
             revert("ERC7818: validityPeriod must be >= 1");
+        }
 
         ERC7818Storage storage $ = _getERC7818Storage();
         $.name = name_;
@@ -136,15 +118,13 @@ abstract contract ERC7818Upgradeable is
         return _getERC7818Storage().totalSupply;
     }
 
-    function balanceOf(
-        address account
-    ) public view virtual returns (uint256 total) {
+    function balanceOf(address account) public view virtual returns (uint256 total) {
         ERC7818Storage storage $ = _getERC7818Storage();
         uint256 current = currentEpoch();
         uint256[] storage epochs = $.epochList[account];
         uint256 len = epochs.length;
 
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i = 0; i < len;) {
             uint256 e = epochs[i];
             if (_epochValid($, e, current)) {
                 total += $.epochBalances[account][e];
@@ -160,27 +140,17 @@ abstract contract ERC7818Upgradeable is
         return true;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) public virtual returns (bool) {
+    function transferFrom(address from, address to, uint256 value) public virtual returns (bool) {
         _spendAllowance(from, _msgSender(), value);
         _transfer(from, to, value);
         return true;
     }
 
-    function allowance(
-        address owner,
-        address spender
-    ) public view virtual returns (uint256) {
+    function allowance(address owner, address spender) public view virtual returns (uint256) {
         return _getERC7818Storage().allowances[owner][spender];
     }
 
-    function approve(
-        address spender,
-        uint256 value
-    ) public virtual returns (bool) {
+    function approve(address spender, uint256 value) public virtual returns (bool) {
         _approve(_msgSender(), spender, value);
         return true;
     }
@@ -206,10 +176,7 @@ abstract contract ERC7818Upgradeable is
         return _getERC7818Storage().validityPeriod;
     }
 
-    function balanceOfAtEpoch(
-        uint256 epoch,
-        address account
-    ) external view virtual returns (uint256) {
+    function balanceOfAtEpoch(uint256 epoch, address account) external view virtual returns (uint256) {
         ERC7818Storage storage $ = _getERC7818Storage();
         if (!_epochValid($, epoch, currentEpoch())) return 0;
         return $.epochBalances[account][epoch];
@@ -219,31 +186,24 @@ abstract contract ERC7818Upgradeable is
     // IERC7818 — optional
     // -------------------------------------------------------------------------
 
-    function getEpochBalance(
-        uint256 epoch,
-        address account
-    ) external view virtual returns (uint256) {
+    function getEpochBalance(uint256 epoch, address account) external view virtual returns (uint256) {
         return _getERC7818Storage().epochBalances[account][epoch];
     }
 
-    function getEpochInfo(
-        uint256 epoch
-    ) external view virtual returns (uint256 start, uint256 end) {
+    function getEpochInfo(uint256 epoch) external view virtual returns (uint256 start, uint256 end) {
         ERC7818Storage storage $ = _getERC7818Storage();
         start = $.genesisPoint + epoch * $.epochDuration;
         end = start + $.epochDuration;
     }
 
-    function getNearestExpiryOf(
-        address account
-    ) external view virtual returns (uint256 amount, uint256 expiry) {
+    function getNearestExpiryOf(address account) external view virtual returns (uint256 amount, uint256 expiry) {
         ERC7818Storage storage $ = _getERC7818Storage();
         uint256 current = currentEpoch();
         uint256[] storage epochs = $.epochList[account];
         uint256 len = epochs.length;
         uint256 nearest = type(uint256).max;
 
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i = 0; i < len;) {
             uint256 e = epochs[i];
             if (_epochValid($, e, current) && $.epochBalances[account][e] > 0) {
                 if (e < nearest) nearest = e;
@@ -255,21 +215,14 @@ abstract contract ERC7818Upgradeable is
 
         if (nearest == type(uint256).max) return (0, 0);
         amount = $.epochBalances[account][nearest];
-        expiry =
-            $.genesisPoint +
-            (nearest + $.validityPeriod) *
-            $.epochDuration;
+        expiry = $.genesisPoint + (nearest + $.validityPeriod) * $.epochDuration;
     }
 
     // -------------------------------------------------------------------------
     // Internal — transfer
     // -------------------------------------------------------------------------
 
-    function _transfer(
-        address from,
-        address to,
-        uint256 value
-    ) internal virtual {
+    function _transfer(address from, address to, uint256 value) internal virtual {
         if (from == address(0)) revert ERC7818InvalidSender(address(0));
         if (to == address(0)) revert ERC7818InvalidReceiver(address(0));
 
@@ -281,11 +234,9 @@ abstract contract ERC7818Upgradeable is
         if (from == to) {
             uint256 active = balanceOf(from);
             if (active < value) {
-                if (active == 0)
-                    revert ERC7818TransferredExpiredToken(
-                        from,
-                        _oldestNonEmptyEpoch(_getERC7818Storage(), from)
-                    );
+                if (active == 0) {
+                    revert ERC7818TransferredExpiredToken(from, _oldestNonEmptyEpoch(_getERC7818Storage(), from));
+                }
                 revert ERC7818InsufficientActiveBalance(from, active, value);
             }
             emit Transfer(from, to, value);
@@ -298,14 +249,12 @@ abstract contract ERC7818Upgradeable is
         uint256[] storage epochs = $.epochList[from];
         uint256 len = epochs.length;
 
-        for (uint256 i = 0; i < len && remaining > 0; ) {
+        for (uint256 i = 0; i < len && remaining > 0;) {
             uint256 e = epochs[i];
             if (_epochValid($, e, current)) {
                 uint256 available = $.epochBalances[from][e];
                 if (available > 0) {
-                    uint256 spend = available >= remaining
-                        ? remaining
-                        : available;
+                    uint256 spend = available >= remaining ? remaining : available;
                     $.epochBalances[from][e] -= spend;
                     remaining -= spend;
                     _credit($, to, e, spend);
@@ -318,11 +267,9 @@ abstract contract ERC7818Upgradeable is
 
         if (remaining > 0) {
             uint256 active = value - remaining;
-            if (active == 0)
-                revert ERC7818TransferredExpiredToken(
-                    from,
-                    _oldestNonEmptyEpoch($, from)
-                );
+            if (active == 0) {
+                revert ERC7818TransferredExpiredToken(from, _oldestNonEmptyEpoch($, from));
+            }
             revert ERC7818InsufficientActiveBalance(from, active, value);
         }
 
@@ -356,14 +303,12 @@ abstract contract ERC7818Upgradeable is
         uint256[] storage epochs = $.epochList[account];
         uint256 len = epochs.length;
 
-        for (uint256 i = 0; i < len && remaining > 0; ) {
+        for (uint256 i = 0; i < len && remaining > 0;) {
             uint256 e = epochs[i];
             if (_epochValid($, e, current)) {
                 uint256 available = $.epochBalances[account][e];
                 if (available > 0) {
-                    uint256 burn = available >= remaining
-                        ? remaining
-                        : available;
+                    uint256 burn = available >= remaining ? remaining : available;
                     $.epochBalances[account][e] -= burn;
                     remaining -= burn;
                 }
@@ -375,11 +320,9 @@ abstract contract ERC7818Upgradeable is
 
         if (remaining > 0) {
             uint256 active = amount - remaining;
-            if (active == 0)
-                revert ERC7818TransferredExpiredToken(
-                    account,
-                    _oldestNonEmptyEpoch($, account)
-                );
+            if (active == 0) {
+                revert ERC7818TransferredExpiredToken(account, _oldestNonEmptyEpoch($, account));
+            }
             revert ERC7818InsufficientActiveBalance(account, active, amount);
         }
 
@@ -391,30 +334,21 @@ abstract contract ERC7818Upgradeable is
     // Internal — allowance
     // -------------------------------------------------------------------------
 
-    function _approve(
-        address owner,
-        address spender,
-        uint256 value
-    ) internal virtual {
+    function _approve(address owner, address spender, uint256 value) internal virtual {
         if (owner == address(0)) revert ERC7818InvalidApprover(address(0));
         if (spender == address(0)) revert ERC7818InvalidSpender(address(0));
         _getERC7818Storage().allowances[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
 
-    function _spendAllowance(
-        address owner,
-        address spender,
-        uint256 value
-    ) internal virtual {
+    function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
         uint256 current = allowance(owner, spender);
         if (current != type(uint256).max) {
-            if (current < value)
+            if (current < value) {
                 revert ERC7818InsufficientAllowance(spender, current, value);
+            }
             unchecked {
-                _getERC7818Storage().allowances[owner][spender] =
-                    current -
-                    value;
+                _getERC7818Storage().allowances[owner][spender] = current - value;
             }
         }
     }
@@ -423,21 +357,17 @@ abstract contract ERC7818Upgradeable is
     // Internal — epoch helpers
     // -------------------------------------------------------------------------
 
-    function _epochValid(
-        ERC7818Storage storage $,
-        uint256 target,
-        uint256 current
-    ) internal view virtual returns (bool) {
+    function _epochValid(ERC7818Storage storage $, uint256 target, uint256 current)
+        internal
+        view
+        virtual
+        returns (bool)
+    {
         if (target > current) return false;
         return (current - target) < $.validityPeriod;
     }
 
-    function _credit(
-        ERC7818Storage storage $,
-        address account,
-        uint256 epoch,
-        uint256 amount
-    ) private {
+    function _credit(ERC7818Storage storage $, address account, uint256 epoch, uint256 amount) private {
         if ($.epochBalances[account][epoch] == 0 && amount > 0) {
             $.epochList[account].push(epoch);
         }
@@ -448,13 +378,10 @@ abstract contract ERC7818Upgradeable is
         return et == EPOCH_TYPE.BLOCKS_BASED ? block.number : block.timestamp;
     }
 
-    function _oldestNonEmptyEpoch(
-        ERC7818Storage storage $,
-        address account
-    ) private view returns (uint256) {
+    function _oldestNonEmptyEpoch(ERC7818Storage storage $, address account) private view returns (uint256) {
         uint256[] storage epochs = $.epochList[account];
         uint256 len = epochs.length;
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i = 0; i < len;) {
             if ($.epochBalances[account][epochs[i]] > 0) return epochs[i];
             unchecked {
                 ++i;

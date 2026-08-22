@@ -52,11 +52,7 @@ interface IERC7818 is IERC20 {
      * @param available The active balance available.
      * @param required  The amount requested.
      */
-    error ERC7818InsufficientActiveBalance(
-        address account,
-        uint256 available,
-        uint256 required
-    );
+    error ERC7818InsufficientActiveBalance(address account, uint256 available, uint256 required);
 
     // -------------------------------------------------------------------------
     // Events
@@ -69,11 +65,7 @@ interface IERC7818 is IERC20 {
      * @param epoch The epoch the tokens are minted into.
      * @param value Amount of tokens minted.
      */
-    event MintedInEpoch(
-        address indexed to,
-        uint256 indexed epoch,
-        uint256 value
-    );
+    event MintedInEpoch(address indexed to, uint256 indexed epoch, uint256 value);
 
     // -------------------------------------------------------------------------
     // Required functions
@@ -83,10 +75,7 @@ interface IERC7818 is IERC20 {
      * @dev Returns the balance of `account` for a specific `epoch`.
      * MUST return 0 if `epoch` is expired.
      */
-    function balanceOfAtEpoch(
-        uint256 epoch,
-        address account
-    ) external view returns (uint256);
+    function balanceOfAtEpoch(uint256 epoch, address account) external view returns (uint256);
 
     /**
      * @dev Returns the current epoch index.
@@ -117,25 +106,18 @@ interface IERC7818 is IERC20 {
      * @dev Returns the raw balance stored in `epoch` for `account`.
      * Unlike {balanceOfAtEpoch}, does NOT return 0 for expired epochs.
      */
-    function getEpochBalance(
-        uint256 epoch,
-        address account
-    ) external view returns (uint256);
+    function getEpochBalance(uint256 epoch, address account) external view returns (uint256);
 
     /**
      * @dev Returns the start (inclusive) and end (exclusive) of `epoch`
      * in the unit defined by {epochType}.
      */
-    function getEpochInfo(
-        uint256 epoch
-    ) external view returns (uint256 start, uint256 end);
+    function getEpochInfo(uint256 epoch) external view returns (uint256 start, uint256 end);
 
     /**
      * @dev Returns the token amount for `account` nearest to expiration and
      * the estimated block / timestamp at which it expires.
      * Returns (0, 0) when the account holds no valid tokens.
      */
-    function getNearestExpiryOf(
-        address account
-    ) external view returns (uint256 amount, uint256 expiry);
+    function getNearestExpiryOf(address account) external view returns (uint256 amount, uint256 expiry);
 }

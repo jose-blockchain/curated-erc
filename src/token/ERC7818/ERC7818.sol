@@ -26,11 +26,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     error ERC7818InvalidSpender(address spender);
 
     /// @dev Thrown when transferFrom exceeds the spender's allowance.
-    error ERC7818InsufficientAllowance(
-        address spender,
-        uint256 allowance,
-        uint256 needed
-    );
+    error ERC7818InsufficientAllowance(address spender, uint256 allowance, uint256 needed);
 
     // -------------------------------------------------------------------------
     // Storage — strings as regular state vars (immutable not allowed for strings)
@@ -63,15 +59,13 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     uint256 private _totalSupply;
 
     /// @dev ERC-20 allowances.
-    mapping(address owner => mapping(address spender => uint256))
-        private _allowances;
+    mapping(address owner => mapping(address spender => uint256)) private _allowances;
 
     /**
      * @dev Per-account per-epoch token balances.
      * _epochBalances[account][epoch] = amount held in that epoch bucket.
      */
-    mapping(address account => mapping(uint256 epoch => uint256 amount))
-        private _epochBalances;
+    mapping(address account => mapping(uint256 epoch => uint256 amount)) private _epochBalances;
 
     /**
      * @dev Ordered list of epochs in which `account` has ever received tokens.
@@ -98,8 +92,9 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
         EPOCH_TYPE epochType_
     ) {
         if (epochDuration_ == 0) revert("ERC7818: epochDuration must be > 0");
-        if (validityPeriod_ == 0)
+        if (validityPeriod_ == 0) {
             revert("ERC7818: validityPeriod must be >= 1");
+        }
 
         _name = name_;
         _symbol = symbol_;
@@ -150,14 +145,12 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
      * buckets. This is O(n) where n = number of distinct epochs the account
      * has ever received tokens in.
      */
-    function balanceOf(
-        address account
-    ) public view virtual returns (uint256 total) {
+    function balanceOf(address account) public view virtual returns (uint256 total) {
         uint256 current = currentEpoch();
         uint256[] storage epochs = _epochList[account];
         uint256 len = epochs.length;
 
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i = 0; i < len;) {
             uint256 e = epochs[i];
             if (_epochValid(e, current)) {
                 total += _epochBalances[account][e];
@@ -184,11 +177,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     /**
      * @dev Transfers `value` tokens from `from` to `to` using the allowance mechanism.
      */
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) public virtual returns (bool) {
+    function transferFrom(address from, address to, uint256 value) public virtual returns (bool) {
         _spendAllowance(from, _msgSender(), value);
         _transfer(from, to, value);
         return true;
@@ -199,18 +188,12 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     // -------------------------------------------------------------------------
 
     /// @inheritdoc IERC20
-    function allowance(
-        address owner,
-        address spender
-    ) public view virtual returns (uint256) {
+    function allowance(address owner, address spender) public view virtual returns (uint256) {
         return _allowances[owner][spender];
     }
 
     /// @inheritdoc IERC20
-    function approve(
-        address spender,
-        uint256 value
-    ) public virtual returns (bool) {
+    function approve(address spender, uint256 value) public virtual returns (bool) {
         _approve(_msgSender(), spender, value);
         return true;
     }
@@ -240,10 +223,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     }
 
     /// @inheritdoc IERC7818
-    function balanceOfAtEpoch(
-        uint256 epoch,
-        address account
-    ) external view virtual returns (uint256) {
+    function balanceOfAtEpoch(uint256 epoch, address account) external view virtual returns (uint256) {
         if (!_epochValid(epoch, currentEpoch())) return 0;
         return _epochBalances[account][epoch];
     }
@@ -253,31 +233,24 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     // -------------------------------------------------------------------------
 
     /// @inheritdoc IERC7818
-    function getEpochBalance(
-        uint256 epoch,
-        address account
-    ) external view virtual returns (uint256) {
+    function getEpochBalance(uint256 epoch, address account) external view virtual returns (uint256) {
         return _epochBalances[account][epoch];
     }
 
     /// @inheritdoc IERC7818
-    function getEpochInfo(
-        uint256 epoch
-    ) external view virtual returns (uint256 start, uint256 end) {
+    function getEpochInfo(uint256 epoch) external view virtual returns (uint256 start, uint256 end) {
         start = _genesisPoint + epoch * _epochDuration;
         end = start + _epochDuration;
     }
 
     /// @inheritdoc IERC7818
-    function getNearestExpiryOf(
-        address account
-    ) external view virtual returns (uint256 amount, uint256 expiry) {
+    function getNearestExpiryOf(address account) external view virtual returns (uint256 amount, uint256 expiry) {
         uint256 current = currentEpoch();
         uint256[] storage epochs = _epochList[account];
         uint256 len = epochs.length;
         uint256 nearest = type(uint256).max;
 
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i = 0; i < len;) {
             uint256 e = epochs[i];
             if (_epochValid(e, current) && _epochBalances[account][e] > 0) {
                 if (e < nearest) nearest = e;
@@ -313,11 +286,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
      *                                     (active balance was 0 to begin with).
      * - {ERC7818InsufficientActiveBalance} if active balance < value but > 0.
      */
-    function _transfer(
-        address from,
-        address to,
-        uint256 value
-    ) internal virtual {
+    function _transfer(address from, address to, uint256 value) internal virtual {
         if (from == address(0)) revert ERC7818InvalidSender(address(0));
         if (to == address(0)) revert ERC7818InvalidReceiver(address(0));
 
@@ -334,10 +303,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
             uint256 active = balanceOf(from);
             if (active < value) {
                 if (active == 0) {
-                    revert ERC7818TransferredExpiredToken(
-                        from,
-                        _oldestNonEmptyEpoch(from)
-                    );
+                    revert ERC7818TransferredExpiredToken(from, _oldestNonEmptyEpoch(from));
                 }
                 revert ERC7818InsufficientActiveBalance(from, active, value);
             }
@@ -351,14 +317,12 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
         uint256[] storage epochs = _epochList[from];
         uint256 len = epochs.length;
 
-        for (uint256 i = 0; i < len && remaining > 0; ) {
+        for (uint256 i = 0; i < len && remaining > 0;) {
             uint256 e = epochs[i];
             if (_epochValid(e, current)) {
                 uint256 available = _epochBalances[from][e];
                 if (available > 0) {
-                    uint256 spend = available >= remaining
-                        ? remaining
-                        : available;
+                    uint256 spend = available >= remaining ? remaining : available;
                     _epochBalances[from][e] -= spend;
                     remaining -= spend;
                     _credit(to, e, spend);
@@ -373,10 +337,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
             uint256 spent = value - remaining;
             uint256 active = spent; // tokens we did manage to find
             if (active == 0) {
-                revert ERC7818TransferredExpiredToken(
-                    from,
-                    _oldestNonEmptyEpoch(from)
-                );
+                revert ERC7818TransferredExpiredToken(from, _oldestNonEmptyEpoch(from));
             }
             revert ERC7818InsufficientActiveBalance(from, active, value);
         }
@@ -425,14 +386,12 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
         uint256[] storage epochs = _epochList[account];
         uint256 len = epochs.length;
 
-        for (uint256 i = 0; i < len && remaining > 0; ) {
+        for (uint256 i = 0; i < len && remaining > 0;) {
             uint256 e = epochs[i];
             if (_epochValid(e, current)) {
                 uint256 available = _epochBalances[account][e];
                 if (available > 0) {
-                    uint256 burn = available >= remaining
-                        ? remaining
-                        : available;
+                    uint256 burn = available >= remaining ? remaining : available;
                     _epochBalances[account][e] -= burn;
                     remaining -= burn;
                 }
@@ -445,10 +404,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
         if (remaining > 0) {
             uint256 active = amount - remaining;
             if (active == 0) {
-                revert ERC7818TransferredExpiredToken(
-                    account,
-                    _oldestNonEmptyEpoch(account)
-                );
+                revert ERC7818TransferredExpiredToken(account, _oldestNonEmptyEpoch(account));
             }
             revert ERC7818InsufficientActiveBalance(account, active, amount);
         }
@@ -461,26 +417,19 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
     // Internal — allowance
     // -------------------------------------------------------------------------
 
-    function _approve(
-        address owner,
-        address spender,
-        uint256 value
-    ) internal virtual {
+    function _approve(address owner, address spender, uint256 value) internal virtual {
         if (owner == address(0)) revert ERC7818InvalidApprover(address(0));
         if (spender == address(0)) revert ERC7818InvalidSpender(address(0));
         _allowances[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
 
-    function _spendAllowance(
-        address owner,
-        address spender,
-        uint256 value
-    ) internal virtual {
+    function _spendAllowance(address owner, address spender, uint256 value) internal virtual {
         uint256 current = allowance(owner, spender);
         if (current != type(uint256).max) {
-            if (current < value)
+            if (current < value) {
                 revert ERC7818InsufficientAllowance(spender, current, value);
+            }
             unchecked {
                 _allowances[owner][spender] = current - value;
             }
@@ -496,10 +445,7 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
      *
      * epoch N is valid while: currentEpoch - N < validityPeriod
      */
-    function _epochValid(
-        uint256 target,
-        uint256 current
-    ) internal view virtual returns (bool) {
+    function _epochValid(uint256 target, uint256 current) internal view virtual returns (bool) {
         if (target > current) return false;
         return (current - target) < _validityPeriod;
     }
@@ -519,22 +465,17 @@ abstract contract ERC7818 is Context, IERC7818, IERC20Metadata {
      * @dev Returns block.timestamp (TIME_BASED) or block.number (BLOCKS_BASED).
      */
     function _point() internal view virtual returns (uint256) {
-        return
-            _epochType == EPOCH_TYPE.BLOCKS_BASED
-                ? block.number
-                : block.timestamp;
+        return _epochType == EPOCH_TYPE.BLOCKS_BASED ? block.number : block.timestamp;
     }
 
     /**
      * @dev Returns the oldest epoch index with a non-zero raw balance for `account`.
      * Used to surface a meaningful epoch in revert errors.
      */
-    function _oldestNonEmptyEpoch(
-        address account
-    ) private view returns (uint256) {
+    function _oldestNonEmptyEpoch(address account) private view returns (uint256) {
         uint256[] storage epochs = _epochList[account];
         uint256 len = epochs.length;
-        for (uint256 i = 0; i < len; ) {
+        for (uint256 i = 0; i < len;) {
             if (_epochBalances[account][epochs[i]] > 0) return epochs[i];
             unchecked {
                 ++i;
