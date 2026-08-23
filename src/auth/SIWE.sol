@@ -11,6 +11,9 @@ import {IERC1271} from "../utils/cryptography/IERC1271.sol";
  *
  * Verifies ERC-191 personal_sign signatures over SIWE plaintext messages and supports
  * optional field checks (chain ID, nonce, domain) via substring matching in the message body.
+ *
+ * {parse} performs a structured ERC-4361 field extract. Optional timestamps are kept as
+ * ISO-8601 strings; callers convert them off-chain or pass unix times into {verify}.
  */
 library SIWE {
     bytes4 private constant _ERC1271_MAGIC_VALUE = 0x1626ba7e;
@@ -24,6 +27,23 @@ library SIWE {
     error SIWEExpired();
     error SIWENotYetValid();
     error SIWEInvalidAddressLine();
+    error SIWEInvalidFormat();
+    error SIWEMissingField();
+
+    /// @dev Structured ERC-4361 fields. Optional strings are empty when omitted.
+    struct Message {
+        string domain;
+        address user;
+        string statement;
+        string uri;
+        uint256 version;
+        uint256 chainId;
+        string nonce;
+        string issuedAt;
+        string expirationTime;
+        string notBefore;
+        string requestId;
+    }
 
     struct VerificationParams {
         string message;
@@ -62,6 +82,102 @@ library SIWE {
         }
         (bool ok, bytes memory res) = account.staticcall(abi.encodeCall(IERC1271.isValidSignature, (digest, signature)));
         return ok && res.length >= 32 && abi.decode(res, (bytes4)) == _ERC1271_MAGIC_VALUE;
+    }
+
+    /**
+     * @dev Parses required and optional ERC-4361 fields from `message`.
+     * Reverts on a malformed header, address, version other than 1, or missing required fields.
+     * Resource lists are ignored so an attacker cannot force unbounded allocation.
+     */
+    function parse(string memory message) internal pure returns (Message memory parsed) {
+        bytes memory raw = bytes(message);
+        bytes memory header = bytes(" wants you to sign in with your Ethereum account:\n");
+        uint256 headerAt = _indexOf(raw, header, 0);
+        if (headerAt == 0 || headerAt == type(uint256).max) {
+            revert SIWEInvalidFormat();
+        }
+        parsed.domain = string(_slice(raw, 0, headerAt));
+        if (_indexOf(bytes(parsed.domain), bytes("\n"), 0) != type(uint256).max) {
+            revert SIWEInvalidFormat();
+        }
+
+        uint256 addrStart = headerAt + header.length;
+        uint256 addrEnd = _indexOf(raw, bytes("\n"), addrStart);
+        if (addrEnd == type(uint256).max) {
+            revert SIWEInvalidAddressLine();
+        }
+        parsed.user = _parseHexAddress(_slice(raw, addrStart, addrEnd - addrStart));
+
+        uint256 pos = addrEnd + 1;
+        while (pos < raw.length && raw[pos] == 0x0a) {
+            unchecked {
+                ++pos;
+            }
+        }
+
+        uint256 uriAt = _indexOf(raw, bytes("\nURI: "), pos);
+        if (_startsWithAt(raw, pos, bytes("URI: "))) {
+            parsed.statement = "";
+        } else if (uriAt != type(uint256).max) {
+            uint256 stmtEnd = uriAt;
+            while (stmtEnd > pos && raw[stmtEnd - 1] == 0x0a) {
+                unchecked {
+                    --stmtEnd;
+                }
+            }
+            parsed.statement = string(_slice(raw, pos, stmtEnd - pos));
+            pos = uriAt + 1;
+        } else {
+            revert SIWEMissingField();
+        }
+
+        bool sawUri;
+        bool sawVersion;
+        bool sawChainId;
+        bool sawNonce;
+        bool sawIssuedAt;
+
+        while (pos < raw.length) {
+            uint256 nl = _indexOf(raw, bytes("\n"), pos);
+            uint256 lineEnd = nl == type(uint256).max ? raw.length : nl;
+            if (lineEnd > pos) {
+                bytes memory line = _slice(raw, pos, lineEnd - pos);
+                if (_startsWithAt(line, 0, bytes("URI: "))) {
+                    parsed.uri = string(_slice(line, 5, line.length - 5));
+                    sawUri = true;
+                } else if (_startsWithAt(line, 0, bytes("Version: "))) {
+                    parsed.version = _parseUint(_slice(line, 9, line.length - 9));
+                    sawVersion = true;
+                } else if (_startsWithAt(line, 0, bytes("Chain ID: "))) {
+                    parsed.chainId = _parseUint(_slice(line, 10, line.length - 10));
+                    sawChainId = true;
+                } else if (_startsWithAt(line, 0, bytes("Nonce: "))) {
+                    parsed.nonce = string(_slice(line, 7, line.length - 7));
+                    sawNonce = true;
+                } else if (_startsWithAt(line, 0, bytes("Issued At: "))) {
+                    parsed.issuedAt = string(_slice(line, 11, line.length - 11));
+                    sawIssuedAt = true;
+                } else if (_startsWithAt(line, 0, bytes("Expiration Time: "))) {
+                    parsed.expirationTime = string(_slice(line, 17, line.length - 17));
+                } else if (_startsWithAt(line, 0, bytes("Not Before: "))) {
+                    parsed.notBefore = string(_slice(line, 12, line.length - 12));
+                } else if (_startsWithAt(line, 0, bytes("Request ID: "))) {
+                    parsed.requestId = string(_slice(line, 12, line.length - 12));
+                }
+            }
+            if (nl == type(uint256).max) break;
+            pos = nl + 1;
+        }
+
+        if (
+            !sawUri || bytes(parsed.uri).length == 0 || !sawNonce || bytes(parsed.nonce).length == 0 || !sawIssuedAt
+                || bytes(parsed.issuedAt).length == 0 || !sawChainId
+        ) {
+            revert SIWEMissingField();
+        }
+        if (!sawVersion || parsed.version != 1) {
+            revert SIWEVersionMismatch();
+        }
     }
 
     /// @dev Parses the checksummed address line from a SIWE message.
@@ -198,5 +314,56 @@ library SIWE {
             value /= 10;
         }
         return string(buffer);
+    }
+
+    function _parseHexAddress(bytes memory addrBytes) private pure returns (address) {
+        if (addrBytes.length != 42 || addrBytes[0] != "0" || addrBytes[1] != "x") {
+            revert SIWEInvalidAddressLine();
+        }
+        bytes memory hexAddr = new bytes(20);
+        for (uint256 i; i < 20; i++) {
+            hexAddr[i] = bytes1(_fromHexChar(uint8(addrBytes[2 + i * 2])) << 4)
+                | bytes1(_fromHexChar(uint8(addrBytes[3 + i * 2])));
+        }
+        return address(uint160(bytes20(hexAddr)));
+    }
+
+    function _parseUint(bytes memory data) private pure returns (uint256 result) {
+        if (data.length == 0) revert SIWEInvalidFormat();
+        for (uint256 i; i < data.length; i++) {
+            uint8 c = uint8(data[i]);
+            if (c < 48 || c > 57) revert SIWEInvalidFormat();
+            result = result * 10 + (c - 48);
+        }
+    }
+
+    function _indexOf(bytes memory data, bytes memory needle, uint256 start) private pure returns (uint256) {
+        uint256 n = needle.length;
+        if (n == 0 || start >= data.length || data.length - start < n) {
+            return type(uint256).max;
+        }
+        uint256 last = data.length - n;
+        for (uint256 i = start; i <= last; i++) {
+            if (_startsWithAt(data, i, needle)) return i;
+        }
+        return type(uint256).max;
+    }
+
+    function _startsWithAt(bytes memory data, uint256 start, bytes memory prefix) private pure returns (bool) {
+        uint256 n = prefix.length;
+        if (start >= data.length || data.length - start < n) return false;
+        for (uint256 i; i < n; i++) {
+            if (data[start + i] != prefix[i]) return false;
+        }
+        return true;
+    }
+
+    function _slice(bytes memory data, uint256 start, uint256 len) private pure returns (bytes memory out) {
+        if (len == 0) return out;
+        if (start >= data.length || data.length - start < len) revert SIWEInvalidFormat();
+        out = new bytes(len);
+        for (uint256 i; i < len; i++) {
+            out[i] = data[start + i];
+        }
     }
 }
