@@ -7,6 +7,9 @@ import {IERC4907} from "./IERC4907.sol";
 
 /**
  * @title ERC4907
+ * @notice Rental NFT standard: grants a time-limited "user" role on top of ERC-721
+ *         ownership so a token can be rented out without transferring it. The user
+ *         role expires automatically at a set UNIX timestamp and is cleared on transfer.
  * @dev Implementation of the {IERC4907} Rental NFT standard.
  *
  * Extends {ERC721} to support a time-limited "user" role distinct from the owner.
