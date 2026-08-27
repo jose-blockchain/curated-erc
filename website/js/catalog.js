@@ -93,6 +93,19 @@ export const CATALOG = [
     palette: ["#f8f0e8", "#d4a574", "#8c5c38", "#3d2418"],
   },
   {
+    id: "erc7818",
+    number: 7818,
+    name: "Expirable ERC-20",
+    category: "Token salon",
+    wing: "token",
+    tagline: "Time-bound balances",
+    description:
+      "Epoch-based ERC-20 where minted buckets expire—balanceOf excludes stale epochs, FIFO spend across valid ones, time or block clocks.",
+    path: "token/ERC7818",
+    eip: "https://eips.ethereum.org/EIPS/eip-7818",
+    palette: ["#fde8e8", "#e07070", "#9a3030", "#3d1010"],
+  },
+  {
     id: "erc1271",
     number: 1271,
     name: "Signature Validation",
@@ -177,7 +190,7 @@ export const CATALOG = [
     wing: "agent",
     tagline: "On-chain login",
     description:
-      "SIWE library and verifier for ERC-191 message authentication—wallet sign-in as gallery admission.",
+      "SIWE library, structured parser, and verifier for ERC-191 message authentication—wallet sign-in as gallery admission.",
     path: "auth/SIWE",
     eip: "https://eips.ethereum.org/EIPS/eip-4361",
     palette: ["#fef3e8", "#e07a4a", "#9a3d28", "#3d1810"],

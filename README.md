@@ -4,7 +4,7 @@
 
 # Curated ERC
 
-> v0.4.1
+> v0.5.0
 
 Canonical implementations of ERCs with real on-chain traction. Foundry-native, Solidity-tested.
 
@@ -39,9 +39,10 @@ Curated ERC Contracts fills that gap.
 | 7201 | Namespaced Storage Layout | Utils / Upgrades |
 | 2535 | Diamonds (Multi-Facet Proxy) | Proxy / Upgrades |
 | 4361 | Sign-In with Ethereum | Auth / Identity |
+| 7818 | Expirable ERC-20 | Token (ERC-20 extension) |
 | 8004 | Trustless Agents | AI Agents (identity, reputation, validation) |
 
-15 standards implemented (non-upgradeable + upgradeable where applicable). Full plan across 40+ ERCs in [ROADMAP.md](./ROADMAP.md). Release history in [CHANGELOG.md](./CHANGELOG.md).
+16 standards implemented (non-upgradeable + upgradeable where applicable). Full plan across 40+ ERCs in [ROADMAP.md](./ROADMAP.md). Release history in [CHANGELOG.md](./CHANGELOG.md).
 
 ## Structure
 
@@ -54,12 +55,14 @@ src/
 │   ├── ERC3525/          # Semi-Fungible Token (slot + value model)
 │   ├── ERC4907/          # Rental NFT (user/owner split with expiry)
 │   ├── ERC5192/          # Soulbound NFT (non-transferable)
-│   └── ERC5484/          # Consensual Soulbound Tokens (burn authorization)
+│   ├── ERC5484/          # Consensual Soulbound Tokens (burn authorization)
+│   └── ERC7818/          # Expirable ERC-20 (epoch-based expiry)
 ├── metatx/               # ERC-2771 Trusted Forwarder context
 ├── finance/              # ERC-3156 Flash Loan lender
 ├── diamond/              # ERC-2535 Diamonds (multi-facet proxy)
 ├── auth/                 # ERC-4361 Sign-In with Ethereum
-│   ├── SIWE.sol          # Library: ERC-191 hash, verify, parse address
+│   ├── SIWE.sol          # Library: ERC-191 hash, verify, parse message
+│   ├── SIWEParser.sol    # Stateless on-chain parser (no signature check)
 │   └── SIWEVerifier.sol  # Stateless on-chain verifier contract
 ├── agent/                # ERC-8004 Trustless Agents
 │   ├── ERC8004IdentityRegistry(.sol|Upgradeable.sol)
@@ -75,7 +78,7 @@ Each ERC typically ships as:
 - `ERC*.sol` — Non-upgradeable implementation (abstract base or deployable contract)
 - `ERC*Upgradeable.sol` — Upgradeable (Initializable + ERC-7201 namespaced storage)
 
-Exceptions: **ERC-4361** exposes a library (`SIWE`) plus `SIWEVerifier`; **ERC-6492** and **ERC-7201** are libraries/utilities; **ERC-8004** ships three deployable registry contracts per variant.
+Exceptions: **ERC-4361** exposes a library (`SIWE`) plus `SIWEParser` and `SIWEVerifier`; **ERC-6492** and **ERC-7201** are libraries/utilities; **ERC-8004** ships three deployable registry contracts per variant.
 
 ## Installation
 
@@ -136,6 +139,21 @@ address user = SIWE.verify(params);
 // Or use the standalone verifier (emits SIWEVerified)
 SIWEVerifier verifier = new SIWEVerifier();
 address user = verifier.verify(params);
+```
+
+**ERC-7818 (Expirable ERC-20)** — tokens expire by epoch; `balanceOf` excludes expired buckets:
+
+```solidity
+import {ERC7818} from "curated-erc/token/ERC7818/ERC7818.sol";
+import {IERC7818} from "curated-erc/token/ERC7818/IERC7818.sol";
+
+contract MyExpirableToken is ERC7818 {
+    constructor() ERC7818("MyToken", "MTK", 7 days, 2, IERC7818.EPOCH_TYPE.TIME_BASED) {}
+
+    function mint(address to, uint256 amount) external {
+        _mintExpirable(to, amount);
+    }
+}
 ```
 
 **ERC-8004 (Trustless Agents)** — deploy the three registries as chain singletons:
@@ -220,7 +238,7 @@ Hardhat will compile the contracts in `node_modules/curated-erc` when resolving 
 ```bash
 forge install
 forge build    # via-ir enabled for stack-heavy registry contracts
-forge test -vv # 261+ tests (unit + fuzz)
+forge test -vv # 378 tests (unit + fuzz)
 ```
 
 ## Dependencies
