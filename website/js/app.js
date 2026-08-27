@@ -11,68 +11,19 @@ const cursorGlow = document.querySelector(".cursor-glow");
 let activeFilter = "all";
 let searchQuery = "";
 
-function hashSeed(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
-  return Math.abs(h);
+function artworkSrc(work) {
+  return `img/ercs/${work.id}.jpg`;
 }
 
-/** @param {CanvasRenderingContext2D} ctx */
-function paintArtwork(ctx, work, w, h, time = 0) {
-  const seed = hashSeed(work.id);
-  const [c0, c1, c2, c3] = work.palette;
-  const g = ctx.createLinearGradient(0, 0, w, h);
-  g.addColorStop(0, c0);
-  g.addColorStop(0.45, c1);
-  g.addColorStop(0.75, c2);
-  g.addColorStop(1, c3);
-  ctx.fillStyle = g;
-  ctx.fillRect(0, 0, w, h);
-
-  const cx = w * (0.35 + ((seed % 30) / 100));
-  const cy = h * (0.4 + ((seed % 20) / 100));
-  const r = Math.min(w, h) * (0.28 + ((seed % 15) / 100));
-
-  for (let i = 0; i < 5; i++) {
-    const angle = (seed % 360) * (Math.PI / 180) + i * 1.2 + time * 0.0002;
-    const ox = cx + Math.cos(angle) * r * 0.6;
-    const oy = cy + Math.sin(angle) * r * 0.5;
-    const grad = ctx.createRadialGradient(ox, oy, 0, ox, oy, r);
-    grad.addColorStop(0, `${c0}cc`);
-    grad.addColorStop(0.5, `${c1}66`);
-    grad.addColorStop(1, "transparent");
-    ctx.fillStyle = grad;
-    ctx.beginPath();
-    ctx.arc(ox, oy, r * (0.9 - i * 0.12), 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  ctx.strokeStyle = `${c3}33`;
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 8; i++) {
-    const t = i / 8 + time * 0.00005;
-    ctx.beginPath();
-    ctx.moveTo(w * t, 0);
-    ctx.bezierCurveTo(w * 0.3, h * 0.4, w * 0.7, h * 0.6, w, h * (((seed + i) % 10) / 10));
-    ctx.stroke();
-  }
-
-  ctx.fillStyle = `${c3}18`;
-  ctx.font = `600 ${Math.floor(w * 0.22)}px "Instrument Serif", serif`;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(String(work.number), w / 2, h * 0.82);
-}
-
-function createPaintingCanvas(work, width, height) {
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  canvas.className = "painting-canvas";
-  canvas.setAttribute("aria-hidden", "true");
-  const ctx = canvas.getContext("2d");
-  paintArtwork(ctx, work, width, height);
-  return canvas;
+function createPainting(work) {
+  const img = document.createElement("img");
+  img.src = artworkSrc(work);
+  img.alt = "";
+  img.width = 960;
+  img.height = 1280;
+  img.loading = "lazy";
+  img.decoding = "async";
+  return img;
 }
 
 function renderCard(work) {
@@ -86,7 +37,7 @@ function renderCard(work) {
 
   const frame = document.createElement("div");
   frame.className = "art-frame";
-  frame.appendChild(createPaintingCanvas(work, 320, 400));
+  frame.appendChild(createPainting(work));
 
   const plaque = document.createElement("div");
   plaque.className = "art-plaque";
@@ -160,9 +111,9 @@ function openModal(work) {
     ${work.eip ? `<a class="btn btn-ghost" href="${work.eip}" target="_blank" rel="noopener">Read EIP</a>` : ""}
   `;
 
-  const canvas = document.getElementById("modal-canvas");
-  const ctx = canvas.getContext("2d");
-  paintArtwork(ctx, work, canvas.width, canvas.height);
+  const art = document.getElementById("modal-art");
+  art.src = artworkSrc(work);
+  art.alt = `Surrealist painting for ERC-${work.number}: ${work.name}`;
 
   modal.showModal();
   document.body.classList.add("modal-open");

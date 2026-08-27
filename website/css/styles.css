@@ -440,11 +440,11 @@ a:hover {
   pointer-events: none;
 }
 
-.art-frame canvas {
+.art-frame img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
 }
 
@@ -615,9 +615,13 @@ a:hover {
   justify-content: center;
 }
 
-.modal-frame canvas {
-  max-width: 100%;
+.modal-frame img {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
   height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
   box-shadow: var(--shadow);
 }
 
