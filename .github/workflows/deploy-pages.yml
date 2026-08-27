@@ -1,11 +1,10 @@
+# GitHub Pages is published from the `website` branch (legacy source, repo root).
+# Do not auto-deploy from Actions on push to main — that races
+# `pages-build-deployment` and fails with "in progress deployment".
+# Sync the site with: bash scripts/sync-website-branch.sh && git push -f origin website
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "website/**"
-      - ".github/workflows/deploy-pages.yml"
   workflow_dispatch:
 
 permissions:
@@ -15,7 +14,7 @@ permissions:
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   deploy:
