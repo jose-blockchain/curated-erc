@@ -1,0 +1,21 @@
+{
+  "style": "Elegant museum-quality surrealist oil painting, Magritte and de Chirico influence. Quiet, slightly uncanny, classical salon lighting, painted canvas texture. Vertical 3:4. No text, letters, numbers, logos, or watermarks.",
+  "prompts": {
+    "erc1363": "A gold coin in mid-flight grows a polite white-gloved hand that knocks on a closed mahogany door; the door is already opening from the other side as if the payment announced itself. Muted cream and umber with a single gold accent.",
+    "erc5192": "A classical marble portrait bust fused into a gallery wall; a small ornate padlock hangs from the figure's throat like a jewel, and the painting cannot be lifted from its frame. Soft violet and slate shadows.",
+    "erc4907": "An empty velvet armchair in a museum gallery; above it a brass hourglass rains sand onto a borrowed golden key that is slowly melting. A second, more permanent iron key hangs unused on the wall. Teal and moss-green shadows.",
+    "erc4906": "A gilded picture frame contains a living portrait whose face is mid-metamorphosis: one half still, one half becoming a different person, while a museum attendant quietly replaces a small brass plaque on the frame. Warm amber light.",
+    "erc5484": "Two pale hands from opposite sides of the canvas turn a single ornate key in a lock set into a soulbound portrait; only together can they release a thin ribbon of smoke. Mauve and deep plum, ceremonial quiet.",
+    "erc2309": "An infinite receding corridor of identical empty gilded frames, each hanging one step further than the last, like a serial mint of consecutive rooms. Cool blue museum light, geometric perspective.",
+    "erc3525": "A tall wooden apothecary cabinet of pigeonholes; each slot holds a different volume of liquid gold in a glass vessel, some nearly empty, some overflowing. Warm ochre and walnut.",
+    "erc7818": "A still life of gold coins arranged in neat rows; the front row is melting into the tablecloth as a long clock-hand shadow sweeps over them, while later rows remain solid. Crimson and cream.",
+    "erc1271": "A classical marble statue of a seated figure holds a quill and signs a blank parchment; the statue itself is the signer. Cool indigo and stone grey.",
+    "erc6492": "A wax seal and signed ribbon float in empty air where a building has not yet been constructed; faint architectural outlines of a house exist only as a ghost behind the valid seal. Pale stone, ivory, and graphite.",
+    "erc2771": "An empty velvet armchair in a vast pale museum hall; a sealed cream envelope floats by itself down the corridor, carrying a message while the sender remains absent. Soft sky-blue, navy, and ivory.",
+    "erc3156": "A vault door stands open for a single heartbeat of lightning: a cascade of gold coins hangs frozen in mid-air, already turning to return to the vault as a clock's second-hand completes one tick. Warm gold and deep umber.",
+    "erc7201": "Nested architectural rooms float in a pale sky, each a complete interior that never overlaps another; drawers and doorways occupy unique coordinates in space. Cool slate, silver, and mist.",
+    "erc2535": "A single cut diamond the size of a building; each facet is a different furnished room visible through the crystal, all entered through one small door at the base. Violet, amethyst, and deep indigo.",
+    "erc4361": "A museum entrance at dusk; a leather wallet unfolds into a golden admission ticket held before a door that opens without a guard. Warm terracotta, dusk orange, and dark wood.",
+    "erc8004": "Three small classical pavilions in a garden: one holds a marble identity bust, one a bronze reputation ledger blooming like a plant, one a glass validation lens. A calm automaton figure walks between them. Emerald, jade, and dark garden green."
+  }
+}
