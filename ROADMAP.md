@@ -56,7 +56,7 @@ Foundry-native, Solidity-tested reference implementations of ERCs with strong co
 | 7092 | Financial Bonds | 🔲 Not started |
 | 3475 | Abstract Storage Bonds | 🔲 Not started |
 | 7751 | Wrapping Bubbled Reverts | 🔲 Not started |
-| 7818 | Expirable ERC-20 | 🔲 Not started |
+| 7818 | Expirable ERC-20 | ✅ Done |
 | 8042 | Diamond Storage | 🔲 Not started |
 
 ## Per-ERC Workflow

@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0] — 2026-08-27
+
+### Added
+
+- **ERC-7818** — Expirable ERC-20: epoch-based balances, FIFO spend across valid epochs, expired epochs excluded from `balanceOf`, time-based or block-based epochs, lazy expiry. Non-upgradeable + upgradeable ([#38](https://github.com/jose-compu/curated-erc/pull/38), closes [#29](https://github.com/jose-compu/curated-erc/issues/29))
+- **ERC-4361 SIWE parser** — `SIWE.parse` returns structured message fields; `SIWEParser` exposes parse on-chain without verifying signatures ([#36](https://github.com/jose-compu/curated-erc/pull/36))
+
+### Changed
+
+- CI runs Foundry `fmt` / `build` / `test` automatically on pull requests
+- **ERC-4907** — NatSpec `@notice` for rental / user-role semantics ([#46](https://github.com/jose-compu/curated-erc/pull/46), closes [#45](https://github.com/jose-compu/curated-erc/issues/45))
+
 ## [0.4.1] — 2026-07-21
 
 ### Fixed
