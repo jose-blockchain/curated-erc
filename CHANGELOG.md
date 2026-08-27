@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.5.1] — 2026-08-27
+
+### Fixed
+
+- **ERC-2535 Diamond tests** — drop unused `vm.prank` before `new Diamond`; Foundry `stable` does not consume a prank on contract creation, which failed CI after merge ([#49](https://github.com/jose-compu/curated-erc/pull/49))
+
+### Changed
+
+- Standards gallery now uses a surrealist oil painting per ERC instead of procedural canvas fills ([#48](https://github.com/jose-compu/curated-erc/pull/48))
+
 ## [0.5.0] — 2026-08-27
 
 ### Added
