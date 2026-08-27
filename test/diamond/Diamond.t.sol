@@ -25,7 +25,6 @@ contract DiamondTest is Test {
         facet2 = new TestFacet2();
 
         IDiamond.FacetCut[] memory empty;
-        vm.prank(owner);
         diamond = new Diamond(owner, empty);
     }
 
@@ -141,7 +140,6 @@ contract DiamondTest is Test {
         cut[0] = IDiamond.FacetCut({
             facetAddress: address(0), action: IDiamond.FacetCutAction.Remove, functionSelectors: selectors
         });
-        vm.prank(owner);
         vm.expectRevert(
             abi.encodeWithSelector(LibDiamond.LibDiamondImmutableSelector.selector, IDiamondLoupe.facets.selector)
         );
@@ -253,7 +251,6 @@ contract DiamondTest is Test {
         cut[0] = IDiamond.FacetCut({
             facetAddress: address(facet), action: IDiamond.FacetCutAction.Add, functionSelectors: selectors
         });
-        vm.prank(owner);
         Diamond d = new Diamond(owner, cut);
         TestFacet(address(d)).setValue(99);
         assertEq(TestFacet(address(d)).getValue(), 99);
